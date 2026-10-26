@@ -50,6 +50,41 @@ public class EventsController : Controller
     }
 
     /// <summary>
+    /// Kirlilik ilanının tüm detaylarını, fotoğraflarını, katılımcı listesini ve harita konumunu içeren detay sayfası
+    /// </summary>
+    [HttpGet]
+    [Route("Events/Details/{id:guid}")]
+    public async Task<IActionResult> Details(Guid id)
+    {
+        var ev = await _context.CleanupEvents
+            .Include(e => e.Creator)
+            .Include(e => e.Participations)
+                .ThenInclude(p => p.User)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(e => e.Id == id);
+
+        if (ev == null)
+        {
+            return NotFound();
+        }
+
+        var currentUserId = GetCurrentUserId();
+        var hasJoined = currentUserId.HasValue && ev.Participations.Any(p => p.UserId == currentUserId.Value);
+        var isCreator = currentUserId.HasValue && ev.CreatorId == currentUserId.Value;
+        var canComplete = currentUserId.HasValue &&
+                          ev.Status != EventStatus.Completed &&
+                          ev.Status != EventStatus.Cancelled &&
+                          (isCreator || hasJoined);
+
+        ViewBag.CurrentUserId = currentUserId;
+        ViewBag.HasJoined = hasJoined;
+        ViewBag.IsCreator = isCreator;
+        ViewBag.CanComplete = canComplete;
+
+        return View(ev);
+    }
+
+    /// <summary>
     /// Harita ve kart listesi için tüm aktif ve tamamlanmış etkinlikleri JSON olarak döner (filtreleme destekli)
     /// </summary>
     [HttpGet]

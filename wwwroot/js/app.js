@@ -26,6 +26,7 @@ const KampusImeceApp = {
         this.initMainMap();
         this.setupFilters();
         this.setupSearch();
+        this.setupMobileTabs();
         this.setupModal();
         this.setupCompleteModal();
         this.setupReportModal();
@@ -37,6 +38,67 @@ const KampusImeceApp = {
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.get('openModal') === 'true') {
             window.openCreateModal();
+        }
+    },
+
+    // MOBİL SEKME YÖNETİMİ (Harita vs İlanlar)
+    setupMobileTabs: function () {
+        window.switchMobileTab = function (tab) {
+            const mapWrapper = document.getElementById('mobileMapWrapper');
+            const cardsWrapper = document.getElementById('mobileCardsWrapper');
+            const mapBtn = document.getElementById('mobileNavMapBtn');
+            const cardsBtn = document.getElementById('mobileNavCardsBtn');
+            const mapInd = document.getElementById('mobileNavMapIndicator');
+            const cardsInd = document.getElementById('mobileNavCardsIndicator');
+
+            if (!mapWrapper || !cardsWrapper) return;
+
+            if (tab === 'cards') {
+                // Kartlar akışını göster, haritayı mobilde gizle
+                mapWrapper.classList.add('hidden');
+                mapWrapper.classList.remove('flex');
+                cardsWrapper.classList.remove('hidden');
+                cardsWrapper.classList.add('flex');
+
+                if (mapBtn && cardsBtn) {
+                    mapBtn.className = 'flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200';
+                    cardsBtn.className = 'flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 text-emerald-600 dark:text-emerald-400 font-bold';
+                    if (mapInd) mapInd.classList.add('hidden');
+                    if (cardsInd) cardsInd.classList.remove('hidden');
+                }
+            } else {
+                // Haritayı göster, kartları mobilde gizle
+                mapWrapper.classList.remove('hidden');
+                mapWrapper.classList.add('flex');
+                cardsWrapper.classList.add('hidden');
+                cardsWrapper.classList.remove('flex');
+
+                if (mapBtn && cardsBtn) {
+                    mapBtn.className = 'flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 text-emerald-600 dark:text-emerald-400 font-bold';
+                    cardsBtn.className = 'flex-1 flex flex-col items-center justify-center py-1 transition-all active:scale-95 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200';
+                    if (mapInd) mapInd.classList.remove('hidden');
+                    if (cardsInd) cardsInd.classList.add('hidden');
+                }
+
+                if (KampusImeceApp && KampusImeceApp.map) {
+                    setTimeout(() => {
+                        KampusImeceApp.map.invalidateSize();
+                    }, 100);
+                }
+            }
+
+            if (window.lucide) lucide.createIcons();
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const view = urlParams.get('view');
+        if (view === 'cards') {
+            window.switchMobileTab('cards');
+        } else {
+            // Mobilde varsayılan görünüm Harita
+            if (window.innerWidth < 1024) {
+                window.switchMobileTab('map');
+            }
         }
     },
 
@@ -248,28 +310,32 @@ const KampusImeceApp = {
                 : '';
 
             const popupHtml = `
-                <div class="p-1 max-w-[230px] font-sans">
-                    <img src="${popupImg}" class="w-full h-24 object-cover rounded-lg mb-2 shadow-sm border border-slate-200" alt="${this.escapeHtml(ev.title)}" />
-                    ${popupBadge}
-                    <h5 class="text-xs font-bold text-slate-900 leading-tight mb-1">${this.escapeHtml(ev.title)}</h5>
+                <div class="p-1 max-w-[240px] font-sans">
+                    <a href="/Events/Details/${ev.id}" class="block group mb-1.5">
+                        <img src="${popupImg}" class="w-full h-24 object-cover rounded-lg mb-1.5 shadow-sm border border-slate-200 group-hover:opacity-90 transition" alt="${this.escapeHtml(ev.title)}" />
+                        ${popupBadge}
+                        <h5 class="text-xs font-bold text-slate-900 leading-tight group-hover:text-emerald-700 transition line-clamp-2">${this.escapeHtml(ev.title)}</h5>
+                    </a>
                     <p class="text-[11px] text-emerald-700 font-medium mb-1.5 flex items-center gap-1">
-                        <i data-lucide="map-pin" class="w-3 h-3"></i> ${this.escapeHtml(ev.locationName)}
+                        <i data-lucide="map-pin" class="w-3 h-3 shrink-0"></i>
+                        <span class="truncate">${this.escapeHtml(ev.locationName)}</span>
                     </p>
                     <div class="flex items-center justify-between text-[11px] bg-slate-50 p-1.5 rounded-md border border-slate-200 mb-2">
                         <span>Gönüllü:</span>
                         <strong class="${isCompleted ? 'text-emerald-700' : (isFull ? 'text-amber-600' : 'text-emerald-700')}">
-                            ${isCompleted ? 'Temizlendi' : `${ev.currentParticipantsCount} / ${ev.requiredVolunteers}`}
+                            ${isCompleted ? 'Temizlendi ✨' : `${ev.currentParticipantsCount} / ${ev.requiredVolunteers}`}
                         </strong>
                     </div>
                     <div class="flex items-center gap-1.5">
-                        <button onclick="KampusImeceApp.scrollToCard('${ev.id}')" class="flex-1 py-1.5 rounded-md bg-slate-900 hover:bg-slate-800 text-white text-[10px] font-bold transition">
-                            Karta Odaklan
-                        </button>
-                        <button onclick="KampusImeceApp.openReportModal('${ev.id}', '${this.escapeHtml(ev.title)}')" title="Uygunsuz İlanı Bildir" class="p-1.5 rounded-md bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 text-[10px] border border-slate-200 transition">
+                        <a href="/Events/Details/${ev.id}" class="flex-1 py-1.5 px-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition flex items-center justify-center gap-1 text-center shadow-sm active:scale-95">
+                            <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i>
+                            <span>İlana Git</span>
+                        </a>
+                        <button onclick="KampusImeceApp.openReportModal('${ev.id}', '${this.escapeHtml(ev.title)}')" title="Uygunsuz İlanı Bildir" class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 text-[10px] border border-slate-200 transition">
                             <i data-lucide="flag" class="w-3.5 h-3.5"></i>
                         </button>
                         ${ev.isCreator && !isCompleted ? `
-                            <button onclick="KampusImeceApp.deleteEvent('${ev.id}')" title="İlanı Kalıcı Olarak Sil" class="py-1.5 px-2.5 rounded-md bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] font-bold border border-rose-200 transition">
+                            <button onclick="KampusImeceApp.deleteEvent('${ev.id}')" title="İlanı Kalıcı Olarak Sil" class="py-1.5 px-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] font-bold border border-rose-200 transition">
                                 Sil
                             </button>` : ''}
                     </div>
@@ -357,7 +423,7 @@ const KampusImeceApp = {
                     </div>`;
             } else if (!isAuth) {
                 actionBtnHtml = `
-                    <a href="/Auth/Login" class="w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+                    <a href="/Auth/Login" onclick="event.stopPropagation();" class="w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
                         <i data-lucide="log-in" class="w-3.5 h-3.5 shrink-0"></i>
                         <span>Giriş Yap ve Katıl</span>
                     </a>`;
@@ -366,13 +432,13 @@ const KampusImeceApp = {
                 actionBtnHtml = `
                     <div class="grid grid-cols-2 gap-2">
                         <button type="button" 
-                                onclick="KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
+                                onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
                                 class="w-full py-2 px-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
                             <i data-lucide="camera" class="w-3.5 h-3.5 shrink-0"></i>
                             <span>Kanıtla</span>
                         </button>
                         <button type="button" 
-                                onclick="KampusImeceApp.deleteEvent('${ev.id}')" 
+                                onclick="event.stopPropagation(); KampusImeceApp.deleteEvent('${ev.id}')" 
                                 class="w-full py-2 px-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap">
                             <i data-lucide="trash-2" class="w-3.5 h-3.5 shrink-0"></i>
                             <span>İlanı Sil</span>
@@ -384,20 +450,20 @@ const KampusImeceApp = {
                     ${ev.canCurrentUserComplete ? `
                         <div class="grid grid-cols-2 gap-2">
                             <button type="button" 
-                                    onclick="KampusImeceApp.toggleJoin('${ev.id}', this)" 
+                                    onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
                                     class="w-full py-2 px-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap">
                                 <i data-lucide="user-minus" class="w-3.5 h-3.5 shrink-0"></i>
                                 <span>Ayrıl</span>
                             </button>
                             <button type="button" 
-                                    onclick="KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
+                                    onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
                                     class="w-full py-2 px-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
                                 <i data-lucide="camera" class="w-3.5 h-3.5 shrink-0"></i>
                                 <span>Kanıtla</span>
                             </button>
                         </div>` : `
                         <button type="button" 
-                                onclick="KampusImeceApp.toggleJoin('${ev.id}', this)" 
+                                onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
                                 class="w-full py-2 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition active:scale-95">
                             <i data-lucide="user-minus" class="w-3.5 h-3.5 shrink-0"></i>
                             <span>Katılımı İptal Et</span>
@@ -405,6 +471,7 @@ const KampusImeceApp = {
             } else if (isFull) {
                 actionBtnHtml = `
                     <button type="button" 
+                            onclick="event.stopPropagation();" 
                             disabled 
                             class="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-medium text-xs flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700 cursor-not-allowed">
                         <i data-lucide="lock" class="w-3.5 h-3.5 shrink-0"></i>
@@ -413,7 +480,7 @@ const KampusImeceApp = {
             } else {
                 actionBtnHtml = `
                     <button type="button" 
-                            onclick="KampusImeceApp.toggleJoin('${ev.id}', this)" 
+                            onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
                             class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95">
                         <i data-lucide="hand" class="w-3.5 h-3.5 shrink-0"></i>
                         <span>Katılıyorum (+1)</span>
@@ -460,7 +527,9 @@ const KampusImeceApp = {
             const formattedDate = dateObj.toLocaleDateString('tr-TR', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
 
             html += `
-                <div id="event-card-${ev.id}" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500/30 dark:hover:border-emerald-500/30 transition-all duration-200 flex flex-col overflow-hidden group">
+                <div id="event-card-${ev.id}" 
+                     onclick="window.location.href='/Events/Details/${ev.id}'" 
+                     class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all duration-200 flex flex-col overflow-hidden group cursor-pointer active:scale-[0.99]">
                     <!-- ÜST RESİM VE ROZETLER -->
                     <div class="relative h-36 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
                         <img id="event-img-${ev.id}" src="${displayImageUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${this.escapeHtml(ev.title)}" />
@@ -498,10 +567,15 @@ const KampusImeceApp = {
                     <!-- KART GÖVDESİ (HER BİLGİ NET, FERAH & KESİNTİSİZ) -->
                     <div class="p-3 flex-1 flex flex-col justify-between">
                         <div>
-                            <!-- Başlık (2 satıra kadar net okunaklı, boy hizalı) -->
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 min-h-[2rem] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title="${this.escapeHtml(ev.title)}">
-                                ${this.escapeHtml(ev.title)}
-                            </h4>
+                            <!-- Başlık & Detay Oku (2 satıra kadar net okunaklı, boy hizalı) -->
+                            <div class="flex items-start justify-between gap-1.5 min-h-[2rem]">
+                                <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title="${this.escapeHtml(ev.title)}">
+                                    ${this.escapeHtml(ev.title)}
+                                </h4>
+                                <span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold shrink-0 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 pt-0.5">
+                                    Detay <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                                </span>
+                            </div>
                             <!-- Açıklama (Her detay rahatça okunur) -->
                             <p class="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mt-1 mb-2.5 min-h-[1.8rem]">
                                 ${this.escapeHtml(ev.description || 'Açıklama belirtilmedi.')}
