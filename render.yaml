@@ -5,6 +5,7 @@ services:
     dockerfilePath: Dockerfile
     plan: free
     region: frankfurt
+    autoDeploy: true
     envVars:
       - key: ASPNETCORE_ENVIRONMENT
         value: Production
