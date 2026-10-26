@@ -834,11 +834,15 @@ const KampusImeceApp = {
         const modal = document.getElementById('completeEventModal');
         const form = document.getElementById('completeEventForm');
         const fileInput = document.getElementById('afterPhotoFileInput');
+        const cameraInput = document.getElementById('afterCameraFileInput');
         const dropZone = document.getElementById('afterPhotoDropZone');
         const previewImg = document.getElementById('afterPhotoPreviewImage');
         const previewContainer = document.getElementById('afterPhotoPreviewContainer');
         const promptEl = document.getElementById('afterPhotoDropPrompt');
         const removeBtn = document.getElementById('btnRemoveAfterPhoto');
+        const retakeBtn = document.getElementById('btnRetakeAfterPhoto');
+        const btnCamera = document.getElementById('btnAfterPhotoCamera');
+        const btnGallery = document.getElementById('btnAfterPhotoGallery');
 
         if (!modal || !form) return;
 
@@ -870,6 +874,47 @@ const KampusImeceApp = {
             this.resetAfterPhotoPreview();
         };
 
+        // Buton Dinleyicileri (Kamera vs Galeri)
+        if (btnCamera && cameraInput) {
+            btnCamera.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cameraInput.click();
+            });
+        }
+
+        if (btnGallery && fileInput) {
+            btnGallery.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+        }
+
+        if (retakeBtn && cameraInput) {
+            retakeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cameraInput.click();
+            });
+        }
+
+        // Mobil Kamera Giriş Dinleyicisi
+        if (cameraInput) {
+            cameraInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    if (fileInput) {
+                        try {
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            fileInput.files = dt.files;
+                        } catch (err) {
+                            console.warn('DataTransfer not available:', err);
+                        }
+                    }
+                    this.handleAfterFileSelected(file);
+                }
+            });
+        }
+
         // Dosya Seçim & Sürükle Bırak
         if (dropZone && fileInput) {
             ['dragenter', 'dragover'].forEach(event => {
@@ -899,10 +944,26 @@ const KampusImeceApp = {
                     this.handleAfterFileSelected(e.target.files[0]);
                 }
             });
+
+            // Tıklama ile açma: butonlara veya önizlemeye tıklanmadıysa
+            dropZone.addEventListener('click', (e) => {
+                if (e.target.closest('#btnAfterPhotoCamera') || 
+                    e.target.closest('#btnAfterPhotoGallery') || 
+                    e.target.closest('#afterPhotoPreviewContainer')) {
+                    return;
+                }
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+                if (isMobile && cameraInput) {
+                    cameraInput.click();
+                } else {
+                    fileInput.click();
+                }
+            });
         }
 
         if (removeBtn) {
-            removeBtn.addEventListener('click', () => {
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.resetAfterPhotoPreview();
             });
         }
@@ -925,6 +986,12 @@ const KampusImeceApp = {
 
             try {
                 const formData = new FormData(form);
+                const chosen = (fileInput && fileInput.files && fileInput.files[0]) || 
+                               (cameraInput && cameraInput.files && cameraInput.files[0]);
+                if (chosen) {
+                    formData.set('afterPhoto', chosen);
+                }
+
                 const response = await fetch(`/api/events/${eventId}/complete`, {
                     method: 'POST',
                     body: formData
@@ -1046,6 +1113,7 @@ const KampusImeceApp = {
 
     resetAfterPhotoPreview: function () {
         const fileInput = document.getElementById('afterPhotoFileInput');
+        const cameraInput = document.getElementById('afterCameraFileInput');
         const previewImg = document.getElementById('afterPhotoPreviewImage');
         const previewContainer = document.getElementById('afterPhotoPreviewContainer');
         const dropPrompt = document.getElementById('afterPhotoDropPrompt');
@@ -1053,6 +1121,9 @@ const KampusImeceApp = {
         if (fileInput) {
             fileInput.value = '';
             fileInput.classList.remove('pointer-events-none');
+        }
+        if (cameraInput) {
+            cameraInput.value = '';
         }
         if (previewImg) {
             if (previewImg._blobUrl) {
@@ -1063,6 +1134,7 @@ const KampusImeceApp = {
         }
         if (previewContainer) previewContainer.classList.add('hidden');
         if (dropPrompt) dropPrompt.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
     },
 
     // 9.5. ŞİKAYET / RAPORLAMA MODALI VE GÖNDERİMİ
@@ -1240,6 +1312,24 @@ const KampusImeceApp = {
 
             try {
                 const formData = new FormData(form);
+                
+                // Mobil Kamera ve Dosya Seçici Uyumu: Fotoğrafı her iki girişten de garantiye al
+                const photoInput = document.getElementById('photoFileInput');
+                const photoCamera = document.getElementById('photoCameraInput');
+                const chosenPhoto = (photoInput && photoInput.files && photoInput.files[0]) || 
+                                   (photoCamera && photoCamera.files && photoCamera.files[0]);
+                if (chosenPhoto) {
+                    formData.set('Photo', chosenPhoto);
+                }
+
+                const afterInput = document.getElementById('createAfterPhotoFileInput');
+                const afterCamera = document.getElementById('createAfterCameraFileInput');
+                const chosenAfter = (afterInput && afterInput.files && afterInput.files[0]) || 
+                                   (afterCamera && afterCamera.files && afterCamera.files[0]);
+                if (chosenAfter) {
+                    formData.set('AfterPhoto', chosenAfter);
+                }
+
                 const response = await fetch('/api/events', {
                     method: 'POST',
                     body: formData
@@ -1424,15 +1514,62 @@ const KampusImeceApp = {
         if (badgeLng) badgeLng.innerText = lngFixed;
     },
 
-    // 12. FOTOĞRAF SÜRÜKLE-BIRAK & ÖNİZLEME
+    // 12. FOTOĞRAF SÜRÜKLE-BIRAK, MOBİL KAMERA & ÖNİZLEME (ÖNCESİ)
     setupPhotoUpload: function () {
         const dropZone = document.getElementById('photoDropZone');
         const fileInput = document.getElementById('photoFileInput');
+        const cameraInput = document.getElementById('photoCameraInput');
         const previewImg = document.getElementById('photoPreviewImage');
         const previewContainer = document.getElementById('photoPreviewContainer');
         const removeBtn = document.getElementById('btnRemovePhoto');
+        const retakeBtn = document.getElementById('btnRetakePhoto');
+        const btnCamera = document.getElementById('btnPhotoCamera');
+        const btnGallery = document.getElementById('btnPhotoGallery');
 
         if (!dropZone || !fileInput) return;
+
+        // Kamera Butonu: Mobil cihazda anında kamerayı açar
+        if (btnCamera && cameraInput) {
+            btnCamera.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cameraInput.click();
+            });
+        }
+
+        // Galeri Butonu: Fotoğraf albümü / dosya seçiciyi açar
+        if (btnGallery) {
+            btnGallery.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+        }
+
+        // Yeniden Çek Butonu
+        if (retakeBtn && cameraInput) {
+            retakeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cameraInput.click();
+            });
+        }
+
+        // Kamera Girişi Dinleyicisi
+        if (cameraInput) {
+            cameraInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    if (fileInput) {
+                        try {
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            fileInput.files = dt.files;
+                        } catch (err) {
+                            console.warn('DataTransfer not available:', err);
+                        }
+                    }
+                    this.handleFileSelected(file);
+                }
+            });
+        }
 
         ['dragenter', 'dragover'].forEach(event => {
             dropZone.addEventListener(event, (e) => {
@@ -1470,7 +1607,15 @@ const KampusImeceApp = {
         }
 
         dropZone.addEventListener('click', (e) => {
-            if (e.target !== fileInput && !e.target.closest('#photoPreviewContainer')) {
+            if (e.target.closest('#btnPhotoCamera') || 
+                e.target.closest('#btnPhotoGallery') || 
+                e.target.closest('#photoPreviewContainer')) {
+                return;
+            }
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+            if (isMobile && cameraInput) {
+                cameraInput.click();
+            } else {
                 fileInput.click();
             }
         });
@@ -1510,6 +1655,7 @@ const KampusImeceApp = {
             if (previewContainer) previewContainer.classList.remove('hidden');
             if (dropPrompt) dropPrompt.classList.add('hidden');
             if (fileInput) fileInput.classList.add('pointer-events-none');
+            if (window.lucide) lucide.createIcons();
         } catch (err) {
             console.error('Önizleme hatası:', err);
         }
@@ -1517,6 +1663,7 @@ const KampusImeceApp = {
 
     resetPhotoPreview: function () {
         const fileInput = document.getElementById('photoFileInput');
+        const cameraInput = document.getElementById('photoCameraInput');
         const previewImg = document.getElementById('photoPreviewImage');
         const previewContainer = document.getElementById('photoPreviewContainer');
         const dropPrompt = document.getElementById('photoDropPrompt');
@@ -1524,6 +1671,9 @@ const KampusImeceApp = {
         if (fileInput) {
             fileInput.value = '';
             fileInput.classList.remove('pointer-events-none');
+        }
+        if (cameraInput) {
+            cameraInput.value = '';
         }
         if (previewImg) {
             if (previewImg._blobUrl) {
@@ -1534,15 +1684,65 @@ const KampusImeceApp = {
         }
         if (previewContainer) previewContainer.classList.add('hidden');
         if (dropPrompt) dropPrompt.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
     },
 
     // 12.B İLAN AÇARKEN İSTEĞE BAĞLI SONRASI FOTOĞRAFI YÜKLEME
     setupCreateAfterPhotoUpload: function () {
         const dropZone = document.getElementById('createAfterPhotoDropZone');
         const fileInput = document.getElementById('createAfterPhotoFileInput');
+        const cameraInput = document.getElementById('createAfterCameraFileInput');
+        const previewImg = document.getElementById('createAfterPhotoPreviewImage');
+        const previewContainer = document.getElementById('createAfterPhotoPreviewContainer');
         const removeBtn = document.getElementById('btnRemoveCreateAfterPhoto');
+        const retakeBtn = document.getElementById('btnRetakeCreateAfterPhoto');
+        const btnCamera = document.getElementById('btnCreateAfterPhotoCamera');
+        const btnGallery = document.getElementById('btnCreateAfterPhotoGallery');
 
         if (!dropZone || !fileInput) return;
+
+        // Kamera Butonu
+        if (btnCamera && cameraInput) {
+            btnCamera.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cameraInput.click();
+            });
+        }
+
+        // Galeri Butonu
+        if (btnGallery) {
+            btnGallery.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fileInput.click();
+            });
+        }
+
+        // Yeniden Çek Butonu
+        if (retakeBtn && cameraInput) {
+            retakeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                cameraInput.click();
+            });
+        }
+
+        // Kamera Girişi Dinleyicisi
+        if (cameraInput) {
+            cameraInput.addEventListener('change', (e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                    const file = e.target.files[0];
+                    if (fileInput) {
+                        try {
+                            const dt = new DataTransfer();
+                            dt.items.add(file);
+                            fileInput.files = dt.files;
+                        } catch (err) {
+                            console.warn('DataTransfer not available:', err);
+                        }
+                    }
+                    this.handleCreateAfterFileSelected(file);
+                }
+            });
+        }
 
         ['dragenter', 'dragover'].forEach(event => {
             dropZone.addEventListener(event, (e) => {
@@ -1580,7 +1780,15 @@ const KampusImeceApp = {
         }
 
         dropZone.addEventListener('click', (e) => {
-            if (e.target !== fileInput && !e.target.closest('#createAfterPhotoPreviewContainer')) {
+            if (e.target.closest('#btnCreateAfterPhotoCamera') || 
+                e.target.closest('#btnCreateAfterPhotoGallery') || 
+                e.target.closest('#createAfterPhotoPreviewContainer')) {
+                return;
+            }
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth < 768;
+            if (isMobile && cameraInput) {
+                cameraInput.click();
+            } else {
                 fileInput.click();
             }
         });
@@ -1618,6 +1826,7 @@ const KampusImeceApp = {
             if (previewContainer) previewContainer.classList.remove('hidden');
             if (dropPrompt) dropPrompt.classList.add('hidden');
             if (fileInput) fileInput.classList.add('pointer-events-none');
+            if (window.lucide) lucide.createIcons();
         } catch (err) {
             console.error('Sonrası önizleme hatası:', err);
         }
@@ -1625,6 +1834,7 @@ const KampusImeceApp = {
 
     resetCreateAfterPhotoPreview: function () {
         const fileInput = document.getElementById('createAfterPhotoFileInput');
+        const cameraInput = document.getElementById('createAfterCameraFileInput');
         const previewImg = document.getElementById('createAfterPhotoPreviewImage');
         const previewContainer = document.getElementById('createAfterPhotoPreviewContainer');
         const dropPrompt = document.getElementById('createAfterPhotoDropPrompt');
@@ -1632,6 +1842,9 @@ const KampusImeceApp = {
         if (fileInput) {
             fileInput.value = '';
             fileInput.classList.remove('pointer-events-none');
+        }
+        if (cameraInput) {
+            cameraInput.value = '';
         }
         if (previewImg) {
             if (previewImg._blobUrl) {
@@ -1642,6 +1855,7 @@ const KampusImeceApp = {
         }
         if (previewContainer) previewContainer.classList.add('hidden');
         if (dropPrompt) dropPrompt.classList.remove('hidden');
+        if (window.lucide) lucide.createIcons();
     },
 
     // 13. GEREKLİ KİŞİ SAYISI (+ / -) SAYAÇ BİLEŞENİ
