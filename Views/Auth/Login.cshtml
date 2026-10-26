@@ -1,0 +1,108 @@
+@model LoginViewModel
+@{
+    ViewData["Title"] = "Giriş Yap";
+}
+
+<div class="min-h-[calc(100vh-12rem)] flex items-center justify-center py-6 px-4">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8 transition-colors">
+        
+        <!-- Üst Başlık -->
+        <div class="text-center mb-6">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center mb-2.5">
+                <i data-lucide="log-in" class="w-5 h-5"></i>
+            </div>
+            <h1 class="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Tekrar Hoş Geldiniz</h1>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Öğrenci hesabınızla oturum açın.</p>
+        </div>
+
+        <!-- Validasyon Özeti -->
+        <div asp-validation-summary="ModelOnly" class="p-3 mb-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-700 dark:text-rose-300 font-medium"></div>
+
+        <!-- Giriş Formu -->
+        <form asp-action="Login" method="post" id="loginForm" class="space-y-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="ReturnUrl" />
+
+            <!-- E-posta -->
+            <div>
+                <label asp-for="Email" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1"></label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                        <i data-lucide="mail" class="w-4 h-4"></i>
+                    </span>
+                    <input asp-for="Email" 
+                           id="loginEmail"
+                           class="w-full pl-9 pr-3 py-2 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 transition" 
+                           placeholder="numaraniz@ogr.selcuk.edu.tr" 
+                           required />
+                </div>
+                <span asp-validation-for="Email" class="text-[11px] text-rose-600 dark:text-rose-400 mt-0.5 block"></span>
+            </div>
+
+            <!-- Şifre -->
+            <div>
+                <label asp-for="Password" class="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1"></label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 dark:text-slate-500">
+                        <i data-lucide="lock" class="w-4 h-4"></i>
+                    </span>
+                    <input asp-for="Password" 
+                           type="password" 
+                           id="loginPassword"
+                           class="w-full pl-9 pr-9 py-2 bg-slate-50/70 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:bg-white dark:focus:bg-slate-800 transition" 
+                           placeholder="••••••••" 
+                           required />
+                    <button type="button" 
+                            onclick="togglePasswordVisibility()" 
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300">
+                        <i data-lucide="eye" id="eyeIcon" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <span asp-validation-for="Password" class="text-[11px] text-rose-600 dark:text-rose-400 mt-0.5 block"></span>
+            </div>
+
+            <!-- Beni Hatırla -->
+            <div class="flex items-center justify-between text-xs">
+                <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                    <input asp-for="RememberMe" type="checkbox" class="w-4 h-4 text-emerald-600 border-slate-300 dark:border-slate-700 rounded focus:ring-emerald-500/20 cursor-pointer" />
+                    <span class="text-slate-600 dark:text-slate-300">Beni hatırla</span>
+                </label>
+            </div>
+
+            <!-- Submit Butonu -->
+            <button type="submit" 
+                    class="w-full py-2.5 px-4 rounded-xl text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-sm active:scale-98 flex items-center justify-center gap-2">
+                <span>Giriş Yap</span>
+                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+            </button>
+        </form>
+
+        <div class="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 text-center text-xs text-slate-500 dark:text-slate-400">
+            Hesabınız yok mu?
+            <a asp-action="Register" class="font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300 ml-1">
+                Kayıt Olun
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('loginPassword');
+            const eyeIcon = document.getElementById('eyeIcon');
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+}

@@ -1,0 +1,19 @@
+@{
+    ViewData["Title"] = "Erişim Reddedildi";
+}
+
+<div class="min-h-[calc(100vh-16rem)] flex items-center justify-center py-12 px-4">
+    <div class="max-w-md w-full bg-white rounded-3xl p-8 text-center shadow-xl border border-slate-200">
+        <div class="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 mx-auto flex items-center justify-center mb-4">
+            <i data-lucide="shield-x" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-900 mb-2">Erişim Yetkiniz Bulunmuyor</h2>
+        <p class="text-xs text-slate-500 mb-6 leading-relaxed">
+            Bu sayfayı görüntülemek veya bu eylemi gerçekleştirmek için gerekli yetkiye (örneğin Proje Koordinatörü rolü) sahip değilsiniz.
+        </p>
+        <a asp-controller="Events" asp-action="Index" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md shadow-emerald-600/30 transition">
+            <i data-lucide="arrow-left" class="w-4 h-4"></i>
+            <span>Ana Sayfaya Dön</span>
+        </a>
+    </div>
+</div>

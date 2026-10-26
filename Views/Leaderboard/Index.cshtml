@@ -1,0 +1,206 @@
+@model List<KampusImece.Models.ViewModels.LeaderboardEntryDto>
+@{
+    ViewData["Title"] = "Liderlik Sıralaması";
+
+    var firstPlace = Model.ElementAtOrDefault(0);
+    var secondPlace = Model.ElementAtOrDefault(1);
+    var thirdPlace = Model.ElementAtOrDefault(2);
+    var restList = Model.Skip(3).ToList();
+}
+
+<div class="space-y-6">
+
+    <!-- ÜST BAŞLIK & PUANLAMA KURALLARI -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <i data-lucide="trophy" class="w-4 h-4 text-amber-500"></i>
+                <h1 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">Gönüllü Liderlik Sıralaması</h1>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Kampüs çevre temizliğine en çok katkı sağlayan öğrenciler.</p>
+        </div>
+
+        <!-- Puanlama Kuralları Çipleri -->
+        <div class="flex items-center gap-2 flex-wrap text-[11px] font-medium text-slate-600 dark:text-slate-300">
+            <span class="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+                <strong class="text-emerald-700 dark:text-emerald-400">+25</strong> İlan Açma
+            </span>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+                <strong class="text-emerald-700 dark:text-emerald-400">+15</strong> İmece Katılımı
+            </span>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+                <strong class="text-amber-600 dark:text-amber-400">+30</strong> Kanıtlanan Temizlik
+            </span>
+            <span class="px-2.5 py-1 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700">
+                <strong class="text-emerald-700 dark:text-emerald-400">+10</strong> Fotoğraf Kanıtı
+            </span>
+        </div>
+    </div>
+
+    <!-- PODYUM (İLK 3 ÖĞRENCİ) -->
+    @if (firstPlace != null)
+    {
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+            
+            <!-- 2. SIRA (GÜMÜŞ) -->
+            <div class="order-2 md:order-1 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm text-center flex flex-col justify-between h-[300px] transition-colors">
+                @if (secondPlace != null)
+                {
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-bold mb-3 border border-slate-200 dark:border-slate-700">
+                            <span>#2 Gümüş</span>
+                        </div>
+                        <div class="w-14 h-14 mx-auto rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-base flex items-center justify-center border border-slate-200 dark:border-slate-700 mb-2">
+                            @secondPlace.Initials
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white leading-snug">@secondPlace.FullName</h3>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 font-mono mb-2">@secondPlace.StudentNumber</p>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                            @secondPlace.BadgeTitle
+                        </span>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <div class="text-lg font-bold text-slate-900 dark:text-white">
+                            @secondPlace.TotalScore <span class="text-xs font-normal text-slate-400 dark:text-slate-500">Puan</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                            @secondPlace.CreatedEventsCount İlan · @secondPlace.JoinedEventsCount Katılım · @secondPlace.CompletedEventsCount Tamamlandı
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- 1. SIRA (ALTIN) -->
+            <div class="order-1 md:order-2 bg-white dark:bg-slate-900 rounded-2xl border-2 border-amber-300 dark:border-amber-500/70 p-6 shadow-md text-center flex flex-col justify-between h-[330px] relative transition-colors">
+                <div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-500 text-white text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider shadow-sm flex items-center gap-1">
+                    <i data-lucide="crown" class="w-3 h-3"></i>
+                    <span>Zirve</span>
+                </div>
+
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 text-[11px] font-bold mb-3 mt-1 border border-amber-200 dark:border-amber-800">
+                        <span>#1 Şampiyon</span>
+                    </div>
+                    <div class="w-16 h-16 mx-auto rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 font-bold text-lg flex items-center justify-center border-2 border-amber-200 dark:border-amber-700 mb-2">
+                        @firstPlace.Initials
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white leading-snug">@firstPlace.FullName</h3>
+                    <p class="text-[11px] text-slate-400 dark:text-slate-500 font-mono mb-2">@firstPlace.StudentNumber</p>
+                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                        @firstPlace.BadgeTitle
+                    </span>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                    <div class="text-2xl font-bold text-slate-900 dark:text-white">
+                        @firstPlace.TotalScore <span class="text-xs font-normal text-slate-400 dark:text-slate-500">Puan</span>
+                    </div>
+                    <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                        @firstPlace.CreatedEventsCount İlan · @firstPlace.JoinedEventsCount Katılım · @firstPlace.CompletedEventsCount Tamamlandı
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. SIRA (BRONZ) -->
+            <div class="order-3 md:order-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm text-center flex flex-col justify-between h-[300px] transition-colors">
+                @if (thirdPlace != null)
+                {
+                    <div>
+                        <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100/60 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 text-[11px] font-bold mb-3 border border-amber-200/80 dark:border-amber-800">
+                            <span>#3 Bronz</span>
+                        </div>
+                        <div class="w-14 h-14 mx-auto rounded-full bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 font-bold text-base flex items-center justify-center border border-amber-200/80 dark:border-amber-800 mb-2">
+                            @thirdPlace.Initials
+                        </div>
+                        <h3 class="text-sm font-bold text-slate-900 dark:text-white leading-snug">@thirdPlace.FullName</h3>
+                        <p class="text-[11px] text-slate-400 dark:text-slate-500 font-mono mb-2">@thirdPlace.StudentNumber</p>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                            @thirdPlace.BadgeTitle
+                        </span>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <div class="text-lg font-bold text-slate-900 dark:text-white">
+                            @thirdPlace.TotalScore <span class="text-xs font-normal text-slate-400 dark:text-slate-500">Puan</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">
+                            @thirdPlace.CreatedEventsCount İlan · @thirdPlace.JoinedEventsCount Katılım · @thirdPlace.CompletedEventsCount Tamamlandı
+                        </div>
+                    </div>
+                }
+            </div>
+
+        </div>
+    }
+
+    <!-- DİĞER GÖNÜLLÜLER (TABLO) -->
+    @if (restList.Any())
+    {
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm transition-colors">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-800">
+                <h2 class="text-xs font-bold text-slate-800 dark:text-white">Topluluk Sıralaması</h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800 text-[11px]">
+                            <th class="py-2.5 px-4 font-medium w-12 text-center">Sıra</th>
+                            <th class="py-2.5 px-4 font-medium">Öğrenci</th>
+                            <th class="py-2.5 px-4 font-medium text-center">Rozet</th>
+                            <th class="py-2.5 px-4 font-medium text-center">İlan / Katılım</th>
+                            <th class="py-2.5 px-4 font-medium text-center">Güvenilirlik</th>
+                            <th class="py-2.5 px-4 font-medium text-right">Toplam Puan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @foreach (var user in restList)
+                        {
+                            <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition">
+                                <td class="py-3 px-4 text-center font-bold text-slate-400 dark:text-slate-500">
+                                    #@user.Rank
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                                            @user.Initials
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-slate-900 dark:text-white">@user.FullName</div>
+                                            <div class="text-[10px] text-slate-400 dark:text-slate-500 font-mono">@user.StudentNumber</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                        @user.BadgeTitle
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-center text-slate-600 dark:text-slate-400">
+                                    <span class="font-medium text-slate-800 dark:text-slate-200">@user.CreatedEventsCount</span> ilan · 
+                                    <span class="font-medium text-slate-800 dark:text-slate-200">@user.JoinedEventsCount</span> katılım
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="text-emerald-700 dark:text-emerald-400 font-bold">@user.ReliabilityScore%</span>
+                                </td>
+                                <td class="py-3 px-4 text-right">
+                                    <span class="font-bold text-slate-900 dark:text-white text-sm">@user.TotalScore</span>
+                                    <span class="text-[10px] text-slate-400 dark:text-slate-500">puan</span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+}

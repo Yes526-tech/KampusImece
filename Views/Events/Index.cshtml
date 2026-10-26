@@ -1,0 +1,466 @@
+@{
+    ViewData["Title"] = "Kampüs Kirlilik Haritası";
+}
+
+@Html.AntiForgeryToken()
+
+<!-- ÜST KONTROL & FİLTRE ÇUBUĞU -->
+<div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    
+    <!-- Filtre Sekmeleri -->
+    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+        <button type="button" 
+                data-filter="all" 
+                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 dark:bg-emerald-600 text-white shadow-sm transition-all whitespace-nowrap">
+            Tümü
+        </button>
+        <button type="button" 
+                data-filter="open" 
+                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
+            Açık Kontenjan
+        </button>
+        <button type="button" 
+                data-filter="completed" 
+                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
+            Temizlenenler ✨
+        </button>
+        <button type="button" 
+                data-filter="yurt" 
+                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
+            Yurt Yolu
+        </button>
+        <button type="button" 
+                data-filter="fakulte" 
+                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
+            Fakülteler
+        </button>
+    </div>
+
+    <!-- Arama & Bildir Butonu -->
+    <div class="flex items-center gap-2">
+        <div class="relative w-full sm:w-56">
+            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                <i data-lucide="search" class="w-3.5 h-3.5"></i>
+            </span>
+            <input type="text" 
+                   id="searchEventsInput" 
+                   placeholder="İlan veya konum ara..." 
+                   class="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition" />
+        </div>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <button type="button" 
+                    onclick="window.openCreateModal()" 
+                    class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-sm whitespace-nowrap active:scale-95">
+                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                <span>İlan Aç</span>
+            </button>
+        }
+    </div>
+</div>
+
+<!-- ANA GÖVDE: SPLIT VIEW (SOL: CANLI HARİTA, SAĞ: KARTLAR) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+
+    <!-- SOL: CANLI HARİTA -->
+    <div class="lg:col-span-5 sticky top-20 z-20">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2 shadow-sm transition-colors">
+            <div class="flex items-center justify-between px-2.5 py-1.5 mb-1 text-xs">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span class="font-semibold text-slate-800 dark:text-slate-100">Kampüs Haritası</span>
+                </div>
+                <div class="flex items-center gap-2.5 text-[11px] text-slate-500 dark:text-slate-400">
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Açık</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Az Kaldı</span>
+                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-700"></span> Bitti</span>
+                </div>
+            </div>
+
+            <!-- Leaflet Container -->
+            <div id="campusLiveMap" class="h-[360px] lg:h-[560px] w-full rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800"></div>
+
+            <div class="px-2.5 pt-2 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
+                <span>Alaaddin Keykubat Kampüsü</span>
+                <span>Pin seçildiğinde karta odaklanır</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- SAĞ: ETKİNLİK KARTLARI -->
+    <div class="lg:col-span-7">
+        <div id="loadingIndicator" class="hidden py-10 text-center">
+            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 shadow-sm">
+                <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-emerald-600"></i>
+                <span>Noktalar yükleniyor...</span>
+            </div>
+        </div>
+
+        <div id="eventsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- JavaScript (app.js) tarafından doldurulur -->
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- 1. YENİ KİRLİLİK BİLDİRİM MODALI                         -->
+<!-- ======================================================== -->
+<div id="createEventModal" 
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 overflow-y-auto">
+    
+    <div class="relative w-full max-w-xl bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+        
+        <!-- Modal Başlık -->
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+                <i data-lucide="camera" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Kirlilik Noktası Bildir</h3>
+            </div>
+            <button type="button" onclick="window.closeCreateModal()" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form id="createEventForm" enctype="multipart/form-data" class="p-5 space-y-3.5">
+            @Html.AntiForgeryToken()
+
+            <div id="modalFormAlert" class="hidden p-2.5 rounded-xl text-xs font-medium border"></div>
+
+            <!-- FOTOĞRAF YÜKLEME -->
+            <div>
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">
+                    Kirlilik Alanı Fotoğrafı *
+                </label>
+                <div id="photoDropZone" 
+                     class="border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 rounded-xl p-3 text-center cursor-pointer transition bg-slate-50/50 dark:bg-slate-800/40 hover:bg-emerald-50/20 relative">
+                    <input type="file" 
+                           name="Photo" 
+                           id="photoFileInput" 
+                           accept="image/*,.jpg,.jpeg,.png,.webp" 
+                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0" 
+                           required />
+                    
+                    <div id="photoDropPrompt" class="py-2">
+                        <i data-lucide="upload-cloud" class="w-6 h-6 text-slate-400 dark:text-slate-500 mx-auto mb-1"></i>
+                        <p class="text-xs font-semibold text-slate-700 dark:text-slate-200">Fotoğraf seçin veya sürükleyin</p>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">JPG, PNG veya WEBP (Maks 15 MB)</p>
+                    </div>
+
+                    <div id="photoPreviewContainer" class="hidden relative z-10">
+                        <img id="photoPreviewImage" class="w-full h-36 object-cover rounded-lg border border-slate-200 dark:border-slate-700" />
+                        <button type="button" 
+                                id="btnRemovePhoto" 
+                                class="absolute top-2 right-2 p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-white text-xs transition z-20 cursor-pointer">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KVKK Görsel Gizlilik Onayı -->
+                <div class="mt-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex items-start gap-2">
+                    <input type="checkbox" id="kvkkPhotoConsent" required 
+                           class="mt-0.5 w-3.5 h-3.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500/20 cursor-pointer" />
+                    <label for="kvkkPhotoConsent" class="text-[11px] text-slate-600 dark:text-slate-300 cursor-pointer select-none leading-tight">
+                        Fotoğrafta 3. şahıslara ait yüz, kimlik veya araç plakası yer almadığını beyan ederim. <span class="text-rose-500 font-bold">*</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- BAŞLIK & KONUM ADI -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Başlık *</label>
+                    <input type="text" 
+                           name="Title" 
+                           required 
+                           maxlength="150" 
+                           placeholder="Örn: Teknoloji Fakültesi Arkası" 
+                           class="w-full px-3 py-1.5 bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition" />
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Konum Adı *</label>
+                    <input type="text" 
+                           name="LocationName" 
+                           required 
+                           maxlength="200" 
+                           placeholder="Örn: C Blok Çıkışı Ağaçlık Alan" 
+                           class="w-full px-3 py-1.5 bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition" />
+                </div>
+            </div>
+
+            <!-- AÇIKLAMA -->
+            <div>
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Açıklama *</label>
+                <textarea name="Description" 
+                          rows="2" 
+                          required 
+                          maxlength="1000" 
+                          placeholder="Çöp türü, eldiven/poşet gereksinimi gibi detaylar..." 
+                          class="w-full px-3 py-1.5 bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"></textarea>
+            </div>
+
+            <!-- HARİTADAN KONUM SEÇİCİ -->
+            <div>
+                <div class="flex items-center justify-between mb-1 text-xs">
+                    <label class="font-medium text-slate-700 dark:text-slate-200">Haritada Konumu İşaretleyin *</label>
+                    <button type="button" 
+                            id="btnGetGpsLocation" 
+                            class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 hover:text-emerald-800">
+                        <i data-lucide="navigation" class="w-3 h-3"></i>
+                        <span>Konumumu Al</span>
+                    </button>
+                </div>
+
+                <div id="modalPickerMap" class="h-36 w-full rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden mb-1"></div>
+
+                <input type="hidden" name="Latitude" id="inputLatitude" value="38.028200" />
+                <input type="hidden" name="Longitude" id="inputLongitude" value="32.508800" />
+                <div class="flex items-center justify-between text-[10px] text-slate-400 dark:text-slate-500">
+                    <span>Pini sürükleyebilir veya haritaya tıklayabilirsiniz.</span>
+                    <span class="font-mono text-slate-500 dark:text-slate-400">
+                        <span id="displayLatitude">38.028200</span>, <span id="displayLongitude">32.508800</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- KOTA & TARİH -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-0.5">
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Gönüllü Kotası *</label>
+                    <div class="flex items-center gap-2">
+                        <button type="button" 
+                                id="btnVolunteerMinus" 
+                                class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold flex items-center justify-center transition active:scale-95">
+                            <i data-lucide="minus" class="w-3.5 h-3.5"></i>
+                        </button>
+                        
+                        <div class="flex-1 py-1.5 px-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-center font-bold text-xs text-slate-800 dark:text-slate-100" id="displayVolunteerCount">
+                            5 Kişi
+                        </div>
+                        <input type="hidden" name="RequiredVolunteers" id="inputRequiredVolunteers" value="5" />
+
+                        <button type="button" 
+                                id="btnVolunteerPlus" 
+                                class="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold flex items-center justify-center transition active:scale-95">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">Buluşma Zamanı *</label>
+                    <input type="datetime-local" 
+                           name="ScheduledAt" 
+                           required 
+                           class="w-full px-3 py-1.5 bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition" />
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button type="button" 
+                        onclick="window.closeCreateModal()" 
+                        class="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                    Vazgeç
+                </button>
+                <button type="submit" 
+                        id="btnSubmitCreateEvent" 
+                        class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition active:scale-95 flex items-center gap-1.5">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>İlanı Başlat</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- 2. TEMİZLİK KANITI YÜKLEME VE TAMAMLAMA MODALI           -->
+<!-- ======================================================== -->
+<div id="completeEventModal" 
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 overflow-y-auto">
+    
+    <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+        
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+                <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Temizlik Kanıtı Yükle</h3>
+            </div>
+            <button type="button" onclick="window.closeCompleteModal()" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <form id="completeEventForm" enctype="multipart/form-data" class="p-5 space-y-3.5">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="completeEventId" name="eventId" value="" />
+
+            <div id="completeModalAlert" class="hidden p-2.5 rounded-xl text-xs font-medium border"></div>
+
+            <div class="p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-xs">
+                <span class="text-slate-400 dark:text-slate-500 block text-[10px]">Tamamlanan İlan:</span>
+                <strong id="completeEventTitle" class="text-slate-800 dark:text-white font-semibold block mt-0.5">...</strong>
+            </div>
+
+            <!-- Sonrası Fotoğrafı -->
+            <div>
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">
+                    Temizlenmiş Alanın Fotoğrafı (Sonrası) *
+                </label>
+                <div id="afterPhotoDropZone" 
+                     class="border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 rounded-xl p-3 text-center cursor-pointer transition bg-slate-50/50 dark:bg-slate-800/40 hover:bg-emerald-50/20 relative">
+                    <input type="file" 
+                           name="afterPhoto" 
+                           id="afterPhotoFileInput" 
+                           accept="image/*,.jpg,.jpeg,.png,.webp" 
+                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0" 
+                           required />
+                    
+                    <div id="afterPhotoDropPrompt" class="py-2">
+                        <i data-lucide="camera" class="w-6 h-6 text-slate-400 dark:text-slate-500 mx-auto mb-1"></i>
+                        <p class="text-xs font-semibold text-slate-700 dark:text-slate-200">Fotoğraf seçin</p>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">JPG, PNG veya WEBP (Maks 15 MB)</p>
+                    </div>
+
+                    <div id="afterPhotoPreviewContainer" class="hidden relative z-10">
+                        <img id="afterPhotoPreviewImage" class="w-full h-36 object-cover rounded-lg border border-slate-200 dark:border-slate-700" />
+                        <button type="button" 
+                                id="btnRemoveAfterPhoto" 
+                                class="absolute top-2 right-2 p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-white text-xs transition z-20 cursor-pointer">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700 flex items-start gap-2">
+                    <input type="checkbox" id="kvkkAfterPhotoConsent" required 
+                           class="mt-0.5 w-3.5 h-3.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500/20 cursor-pointer" />
+                    <label for="kvkkAfterPhotoConsent" class="text-[11px] text-slate-600 dark:text-slate-300 cursor-pointer select-none leading-tight">
+                        Fotoğrafta 3. şahıslara ait yüz, kimlik veya özel veri bulunmadığını onaylıyorum. <span class="text-rose-500 font-bold">*</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Temizlik Notu -->
+            <div>
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">
+                    Temizlik Notu (İsteğe Bağlı)
+                </label>
+                <textarea name="completionNote" 
+                          id="completionNoteInput" 
+                          rows="2" 
+                          maxlength="500" 
+                          placeholder="Örn: 3 poşet plastik atık geri dönüşüme atıldı..." 
+                          class="w-full px-3 py-1.5 bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition"></textarea>
+            </div>
+
+            <div class="p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900 text-[11px] text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
+                <i data-lucide="award" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                <span>Katılımcılara <strong>+30 Bonus</strong>, kanıtı yükleyene <strong>+10 Ekstra</strong> puan eklenir.</span>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button type="button" 
+                        onclick="window.closeCompleteModal()" 
+                        class="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                    Vazgeç
+                </button>
+                <button type="submit" 
+                        id="btnSubmitCompleteEvent" 
+                        class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition active:scale-95 flex items-center gap-1.5">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span>Temizliği Onayla</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- 3. KİRLİLİK İLANINI ŞİKAYET ET / RAPORLA MODALI          -->
+<!-- ======================================================== -->
+<div id="reportEventModal" 
+     class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 overflow-y-auto">
+    
+    <div class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8">
+        
+        <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+                <i data-lucide="flag" class="w-4 h-4 text-rose-600 dark:text-rose-400"></i>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">İlanı Şikayet Et</h3>
+            </div>
+            <button type="button" onclick="KampusImeceApp.closeReportModal()" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+        </div>
+
+        <form id="reportEventForm" class="p-5 space-y-3.5">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="reportEventId" name="EventId" value="" />
+
+            <div id="reportModalAlert" class="hidden p-2.5 rounded-xl text-xs font-medium border"></div>
+
+            <div class="p-2.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 rounded-xl text-xs">
+                <span class="text-slate-400 dark:text-slate-500 block text-[10px]">Şikayet Edilen İlan:</span>
+                <strong id="reportEventTitle" class="text-slate-800 dark:text-white font-semibold block mt-0.5">...</strong>
+            </div>
+
+            <!-- Şikayet Nedeni -->
+            <div>
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">
+                    Şikayet Nedeni *
+                </label>
+                <select name="Reason" 
+                        id="reportReasonSelect" 
+                        required 
+                        class="w-full px-3 py-2 bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition cursor-pointer">
+                    <option value="">Lütfen bir neden seçiniz...</option>
+                    <option value="Sahte Kirlilik Bildirimi">Sahte / Gerçek Dışı Kirlilik Bildirimi</option>
+                    <option value="Uygunsuz veya Müstehcen Görsel">Uygunsuz, Hakaret İçeren veya Müstehcen Görsel</option>
+                    <option value="Tehlikeli veya Yanlış Konum">Tehlikeli, Ulaşılamaz veya Yanlış Konum</option>
+                    <option value="Spam veya Reklam İçeriği">Spam, Reklam veya Çevre Dışı İçerik</option>
+                    <option value="KVKK ve Gizlilik İhlali">KVKK / Kişisel Veri ve Yüz İhlali</option>
+                    <option value="Diğer">Diğer</option>
+                </select>
+            </div>
+
+            <!-- Açıklama -->
+            <div>
+                <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">
+                    Detaylı Açıklama (İsteğe Bağlı)
+                </label>
+                <textarea name="Description" 
+                          id="reportDescriptionInput" 
+                          rows="3" 
+                          maxlength="1000" 
+                          placeholder="Lütfen şikayet gerekçenizi ve dikkat edilmesi gereken noktaları belirtiniz..." 
+                          class="w-full px-3 py-2 bg-slate-50/70 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 transition"></textarea>
+            </div>
+
+            <div class="p-2.5 rounded-xl bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200/70 dark:border-amber-900/60 text-[11px] text-amber-900 dark:text-amber-300 flex items-start gap-2">
+                <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+                <span>Bildiriminiz incelenmek üzere doğrudan moderatör ekibine ve koordinatör e-posta adresine iletilecektir.</span>
+            </div>
+
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <button type="button" 
+                        onclick="KampusImeceApp.closeReportModal()" 
+                        class="px-3.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                    Vazgeç
+                </button>
+                <button type="submit" 
+                        id="btnSubmitReportEvent" 
+                        class="px-4 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold shadow-sm transition active:scale-95 flex items-center gap-1.5">
+                    <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                    <span>Şikayeti İlet</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/app.js" asp-append-version="true"></script>
+}

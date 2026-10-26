@@ -1,0 +1,446 @@
+@model KampusImece.Models.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Koordinatör Yönetim Paneli";
+}
+
+<div class="space-y-6">
+
+    <!-- ÜST BAŞLIK VE ÖZET KARTLARI -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm transition-colors">
+        <div>
+            <div class="flex items-center gap-2 mb-1">
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i>
+                </div>
+                <h1 class="text-base font-bold text-slate-900 dark:text-white tracking-tight">Koordinatör Yönetim Paneli</h1>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                    Moderasyon
+                </span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Topluluk şikayetlerini inceleyin, ilanları ve kullanıcıları yönetin.</p>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <a asp-controller="Events" asp-action="Index" class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition flex items-center gap-1.5">
+                <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+                <span>Haritaya Dön</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- METRİK KARTLARI -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <!-- Bekleyen Şikayet -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border @(Model.PendingReportsCount > 0 ? "border-rose-300 dark:border-rose-900/80 bg-rose-50/20" : "border-slate-200 dark:border-slate-800") shadow-sm transition">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Bekleyen Şikayet</span>
+                <div class="w-7 h-7 rounded-lg @(Model.PendingReportsCount > 0 ? "bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400" : "bg-slate-100 dark:bg-slate-800 text-slate-400") flex items-center justify-center">
+                    <i data-lucide="alert-triangle" class="w-3.5 h-3.5"></i>
+                </div>
+            </div>
+            <div class="text-2xl font-bold @(Model.PendingReportsCount > 0 ? "text-rose-600 dark:text-rose-400" : "text-slate-900 dark:text-white")">
+                @Model.PendingReportsCount
+            </div>
+            <p class="text-[10px] text-slate-400 mt-0.5">İnceleme bekleyen postlar</p>
+        </div>
+
+        <!-- Toplam Kullanıcı -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Toplam Kullanıcı</span>
+                <div class="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                    <i data-lucide="users" class="w-3.5 h-3.5"></i>
+                </div>
+            </div>
+            <div class="text-2xl font-bold text-slate-900 dark:text-white">@Model.TotalUsersCount</div>
+            <p class="text-[10px] text-slate-400 mt-0.5">Kayıtlı öğrenci & gönüllü</p>
+        </div>
+
+        <!-- Aktif İlanlar -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Aktif İlanlar</span>
+                <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                    <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                </div>
+            </div>
+            <div class="text-2xl font-bold text-slate-900 dark:text-white">@Model.ActiveEventsCount</div>
+            <p class="text-[10px] text-slate-400 mt-0.5">Gönüllü aranan veya dolan</p>
+        </div>
+
+        <!-- Çözülen Şikayetler -->
+        <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm transition">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Çözülen Şikayet</span>
+                <div class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center">
+                    <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+                </div>
+            </div>
+            <div class="text-2xl font-bold text-slate-900 dark:text-white">@Model.ResolvedReportsCount</div>
+            <p class="text-[10px] text-slate-400 mt-0.5">Kaldırılan uygunsuz ilanlar</p>
+        </div>
+    </div>
+
+    <!-- SEKMELER (TABS) -->
+    <div class="border-b border-slate-200 dark:border-slate-800 flex items-center gap-2">
+        <a asp-action="Index" asp-route-tab="reports" 
+           class="py-2.5 px-3.5 border-b-2 text-xs font-semibold flex items-center gap-2 transition @(Model.ActiveTab == "reports" ? "border-emerald-600 text-emerald-700 dark:text-emerald-400" : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200")">
+            <i data-lucide="flag" class="w-4 h-4"></i>
+            <span>Şikayetler & Moderasyon</span>
+            @if (Model.PendingReportsCount > 0)
+            {
+                <span class="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-rose-500 text-white">
+                    @Model.PendingReportsCount
+                </span>
+            }
+        </a>
+        <a asp-action="Index" asp-route-tab="users" 
+           class="py-2.5 px-3.5 border-b-2 text-xs font-semibold flex items-center gap-2 transition @(Model.ActiveTab == "users" ? "border-emerald-600 text-emerald-700 dark:text-emerald-400" : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200")">
+            <i data-lucide="users" class="w-4 h-4"></i>
+            <span>Kullanıcı Yönetimi</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                @Model.TotalUsersCount
+            </span>
+        </a>
+        <a asp-action="Index" asp-route-tab="events" 
+           class="py-2.5 px-3.5 border-b-2 text-xs font-semibold flex items-center gap-2 transition @(Model.ActiveTab == "events" ? "border-emerald-600 text-emerald-700 dark:text-emerald-400" : "border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200")">
+            <i data-lucide="layers" class="w-4 h-4"></i>
+            <span>Tüm İlanlar (Postlar)</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                @Model.TotalEventsCount
+            </span>
+        </a>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- 1. SEKME: ŞİKAYETLER (REPORTS)                           -->
+    <!-- ======================================================== -->
+    @if (Model.ActiveTab == "reports")
+    {
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xs font-bold text-slate-900 dark:text-white">Kullanıcı Şikayetleri Listesi</h2>
+                    <p class="text-[11px] text-slate-400">Şikayet bildirimleri anlık olarak <strong>ysert20051@gmail.com</strong> adresine iletilmektedir.</p>
+                </div>
+            </div>
+
+            @if (!Model.Reports.Any())
+            {
+                <div class="py-12 text-center">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center mb-2">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-emerald-600"></i>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-800 dark:text-white">Şikayet Bulunmuyor</h4>
+                    <p class="text-xs text-slate-400 mt-0.5">Topluluk kurallarını ihlal eden bir bildirim henüz yapılmadı.</p>
+                </div>
+            }
+            else
+            {
+                <div class="divide-y divide-slate-100 dark:divide-slate-800">
+                    @foreach (var report in Model.Reports)
+                    {
+                        var isPending = report.Status == KampusImece.Models.Entities.ReportStatus.Pending;
+                        var isResolved = report.Status == KampusImece.Models.Entities.ReportStatus.Resolved;
+
+                        <div class="p-4 sm:p-5 flex flex-col md:flex-row md:items-start justify-between gap-4 transition @(isPending ? "bg-rose-50/20 dark:bg-rose-950/10" : "")">
+                            
+                            <!-- Sol: İlan ve Şikayet Detayları -->
+                            <div class="flex items-start gap-3.5 flex-1">
+                                <!-- İlan Resmi Önizleme -->
+                                @if (!string.IsNullOrWhiteSpace(report.EventImageUrl))
+                                {
+                                    <img src="@report.EventImageUrl" alt="İlan Resmi" class="w-20 h-20 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0" />
+                                }
+                                else
+                                {
+                                    <div class="w-20 h-20 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-400 shrink-0">
+                                        <i data-lucide="image-off" class="w-6 h-6"></i>
+                                    </div>
+                                }
+
+                                <div class="space-y-1 flex-1">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <h3 class="text-sm font-bold text-slate-900 dark:text-white">@report.EventTitle</h3>
+                                        
+                                        <!-- Durum Rozeti -->
+                                        @if (isPending)
+                                        {
+                                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-900">
+                                                İnceleniyor (Beklemede)
+                                            </span>
+                                        }
+                                        else if (isResolved)
+                                        {
+                                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900">
+                                                Çözüldü (İlan Kaldırıldı)
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                                                Reddedildi / İhlal Yok
+                                            </span>
+                                        }
+                                    </div>
+
+                                    <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                                        <span><i data-lucide="map-pin" class="w-3 h-3 inline text-slate-400"></i> @report.EventLocation</span>
+                                        <span>·</span>
+                                        <span>İlan Sahibi: <strong class="text-slate-700 dark:text-slate-300">@report.EventCreatorName</strong> (@report.EventCreatorEmail)</span>
+                                    </div>
+
+                                    <!-- Şikayet Nedeni & Açıklaması -->
+                                    <div class="mt-2 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 text-xs">
+                                        <div class="flex items-center gap-1.5 font-semibold text-rose-600 dark:text-rose-400">
+                                            <i data-lucide="alert-circle" class="w-3.5 h-3.5"></i>
+                                            <span>Neden: @report.Reason</span>
+                                        </div>
+                                        @if (!string.IsNullOrWhiteSpace(report.Description))
+                                        {
+                                            <p class="text-slate-600 dark:text-slate-300 mt-1 italic leading-relaxed">
+                                                "@report.Description"
+                                            </p>
+                                        }
+                                        <div class="mt-1.5 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60 text-[10px] text-slate-400 flex items-center justify-between">
+                                            <span>Şikayet Eden: <strong>@report.ReporterName</strong> (@report.ReporterEmail · No: @report.ReporterStudentNumber)</span>
+                                            <span>@report.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sağ: Moderasyon Eylemleri -->
+                            <div class="flex sm:flex-col gap-2 shrink-0 md:min-w-[160px]">
+                                @if (isPending)
+                                {
+                                    <!-- İlanı Kaldır & Şikayeti Çöz -->
+                                    <form asp-action="ResolveReportAndRemovePost" asp-route-id="@report.ReportId" method="post" onsubmit="return confirm('Bu ilanı kalıcı olarak kaldırmak ve şikayeti çözüldü olarak kapatmak istediğinize emin misiniz?');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" 
+                                                class="w-full py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95">
+                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                            <span>İlanı Kaldır</span>
+                                        </button>
+                                    </form>
+
+                                    <!-- Şikayeti Kapat / Reddet -->
+                                    <form asp-action="DismissReport" asp-route-id="@report.ReportId" method="post" onsubmit="return confirm('Bu şikayeti kapatmak istiyor musunuz? İlan yayında kalmaya devam edecektir.');">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" 
+                                                class="w-full py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 font-medium text-xs flex items-center justify-center gap-1.5 transition">
+                                            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                                            <span>Şikayeti Reddet</span>
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <div class="text-[11px] text-slate-400 text-right md:text-left py-1">
+                                        <span>İncelendi: @(report.ReviewedAt?.ToLocalTime().ToString("dd.MM.yyyy HH:mm") ?? "-")</span>
+                                    </div>
+                                }
+                            </div>
+
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    <!-- ======================================================== -->
+    <!-- 2. SEKME: KULLANICI YÖNETİMİ                            -->
+    <!-- ======================================================== -->
+    @if (Model.ActiveTab == "users")
+    {
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xs font-bold text-slate-900 dark:text-white">Kayıtlı Gönüllüler ve Koordinatörler</h2>
+                    <p class="text-[11px] text-slate-400">Kullanıcıları inceleyebilir, topluluk kurallarını ihlal edenleri sistemden çıkarabilirsiniz.</p>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border-b border-slate-100 dark:border-slate-800 text-[11px]">
+                            <th class="py-3 px-4 font-medium">Kullanıcı</th>
+                            <th class="py-3 px-4 font-medium">İletişim</th>
+                            <th class="py-3 px-4 font-medium text-center">Rol</th>
+                            <th class="py-3 px-4 font-medium text-center">Güvenilirlik</th>
+                            <th class="py-3 px-4 font-medium text-center">İlan / Katılım</th>
+                            <th class="py-3 px-4 font-medium text-center">KVKK Onayı</th>
+                            <th class="py-3 px-4 font-medium text-right">İşlem</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @foreach (var user in Model.Users)
+                        {
+                            <tr class="hover:bg-slate-50/70 dark:hover:bg-slate-800/50 transition">
+                                <td class="py-3 px-4">
+                                    <div class="flex items-center gap-2.5">
+                                        <div class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center border border-slate-200 dark:border-slate-700 shrink-0">
+                                            @(user.FullName.Split(' ').Select(x => x[0]).Take(2).Aggregate("", (c, n) => c + n))
+                                        </div>
+                                        <div>
+                                            <div class="font-semibold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                                <span>@user.FullName</span>
+                                                @if (user.IsCoordinator)
+                                                {
+                                                    <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300">
+                                                        Admin
+                                                    </span>
+                                                }
+                                            </div>
+                                            <div class="text-[10px] text-slate-400 font-mono">No: @user.StudentNumber</div>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="py-3 px-4">
+                                    <div class="text-slate-800 dark:text-slate-200">@user.Email</div>
+                                    <div class="text-[10px] text-slate-400">@(user.PhoneNumber ?? "Telefon Belirtilmedi")</div>
+                                </td>
+
+                                <td class="py-3 px-4 text-center">
+                                    @if (user.IsCoordinator)
+                                    {
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                                            <i data-lucide="shield" class="w-3 h-3"></i> Koordinatör
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                                            Gönüllü
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="py-3 px-4 text-center">
+                                    <span class="font-bold text-emerald-700 dark:text-emerald-400">@user.ReliabilityScore%</span>
+                                </td>
+
+                                <td class="py-3 px-4 text-center text-slate-600 dark:text-slate-300">
+                                    <span><strong>@user.CreatedEventsCount</strong> ilan</span> · 
+                                    <span><strong>@user.JoinedEventsCount</strong> katılım</span>
+                                </td>
+
+                                <td class="py-3 px-4 text-center">
+                                    @if (user.IsKvkkApproved)
+                                    {
+                                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800" title="KVKK onay tarihi: @user.KvkkApprovedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")">
+                                            <i data-lucide="check" class="w-3 h-3"></i> Onaylı
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200">
+                                            Onaysız
+                                        </span>
+                                    }
+                                </td>
+
+                                <td class="py-3 px-4 text-right">
+                                    @if (user.Email.ToLower() != User.Identity?.Name?.ToLower() && 
+                                         user.Email.ToLower() != "233311070@ogr.selcuk.edu.tr" && 
+                                         user.Email.ToLower() != "ysert20051@gmail.com" &&
+                                         user.Email.ToLower() != "233311021@ogr.selcuk.edu.tr")
+                                    {
+                                        <form asp-action="DeleteUser" asp-route-id="@user.UserId" method="post" onsubmit="return confirm('Bu kullanıcıyı ve açtığı tüm etkinlikleri sistemden kalıcı olarak çıkarmak istediğinize emin misiniz?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" 
+                                                    class="py-1 px-2.5 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 font-semibold text-[11px] transition inline-flex items-center gap-1 active:scale-95">
+                                                <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
+                                                <span>Çıkar</span>
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-[10px] text-slate-400 italic">Mevcut Oturum</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <!-- ======================================================== -->
+    <!-- 3. SEKME: TÜM İLANLAR (POSTLAR)                          -->
+    <!-- ======================================================== -->
+    @if (Model.ActiveTab == "events")
+    {
+        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden transition-colors">
+            <div class="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xs font-bold text-slate-900 dark:text-white">Sistemdeki Tüm Kirlilik Bildirimleri</h2>
+                    <p class="text-[11px] text-slate-400">Gerektiğinde uygunsuz veya mükerrer ilanları doğrudan sistemden kaldırabilirsiniz.</p>
+                </div>
+            </div>
+
+            <div class="divide-y divide-slate-100 dark:divide-slate-800">
+                @foreach (var ev in Model.Events)
+                {
+                    <div class="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition">
+                        
+                        <div class="flex items-center gap-3.5 flex-1">
+                            <img src="@ev.ImageUrl" alt="@ev.Title" class="w-16 h-16 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0" />
+                            
+                            <div class="space-y-0.5">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">@ev.Title</h3>
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                                        @ev.StatusText
+                                    </span>
+                                    @if (ev.ReportsCount > 0)
+                                    {
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-900 flex items-center gap-1">
+                                            <i data-lucide="alert-triangle" class="w-3 h-3"></i> @ev.ReportsCount Şikayet
+                                        </span>
+                                    }
+                                </div>
+                                <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                                    <span><i data-lucide="map-pin" class="w-3 h-3 inline text-slate-400"></i> @ev.LocationName</span>
+                                    <span>·</span>
+                                    <span>Gönüllüler: <strong>@ev.ParticipantsCount / @ev.RequiredVolunteers</strong></span>
+                                    <span>·</span>
+                                    <span>İlan Sahibi: @ev.CreatorName (@ev.CreatorEmail)</span>
+                                </div>
+                                <div class="text-[10px] text-slate-400">
+                                    Oluşturulma: @ev.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <form asp-action="DeleteEvent" asp-route-id="@ev.EventId" method="post" onsubmit="return confirm('Bu ilanı kalıcı olarak sistemden kaldırmak istediğinize emin misiniz?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" 
+                                        class="py-2 px-3.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/30 hover:bg-rose-100 dark:hover:bg-rose-900/50 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition active:scale-95">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                    <span>İlanı Kaldır</span>
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.lucide) lucide.createIcons();
+        });
+    </script>
+}

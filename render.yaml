@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: kampus-imece
+    runtime: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    region: frankfurt
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        fromDatabase:
+          name: kampus-imece-db
+          property: connectionString
+      - key: EmailSettings__AdminNotificationEmail
+        value: ysert20051@gmail.com
+
+databases:
+  - name: kampus-imece-db
+    databaseName: kampusimece_db
+    user: kampus_user
+    plan: free
+    region: frankfurt
