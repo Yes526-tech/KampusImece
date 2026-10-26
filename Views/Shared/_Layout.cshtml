@@ -4,7 +4,7 @@
     var isMapPage = activeController == "Events" && activeAction == "Index";
 }
 <!DOCTYPE html>
-<html lang="tr" class="h-full">
+<html lang="tr" class="h-full @(isMapPage ? "overflow-hidden" : "")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -68,10 +68,10 @@
         }
     </style>
 </head>
-<body data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" class="flex flex-col min-h-full font-sans antialiased text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 selection:bg-emerald-500 selection:text-white transition-colors duration-200 @(isMapPage ? "lg:h-screen lg:overflow-hidden" : "")">
+<body data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" class="flex flex-col h-full font-sans antialiased text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 selection:bg-emerald-500 selection:text-white transition-colors duration-200 @(isMapPage ? "overflow-hidden" : "min-h-full")">
 
     <!-- MODERN YEŞİL & BEYAZ NAVBAR -->
-    <header class="sticky top-0 z-50 w-full bg-emerald-600 dark:bg-[#064e3b] border-b border-emerald-500/40 dark:border-emerald-900/60 shadow-sm transition-colors text-white">
+    <header class="sticky top-0 z-50 w-full shrink-0 h-16 bg-emerald-600 dark:bg-[#064e3b] border-b border-emerald-500/40 dark:border-emerald-900/60 shadow-sm transition-colors text-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
 
@@ -180,7 +180,7 @@
     </header>
 
     <!-- ANA İÇERİK ALANI -->
-    <main class="flex-1 w-full @(isMapPage ? "max-w-[1920px] mx-auto px-3 sm:px-4 lg:px-6 py-2 pb-24 md:pb-2 lg:h-[calc(100vh-4rem)] lg:overflow-hidden flex flex-col min-h-0" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-6")">
+    <main class="flex-1 min-h-0 w-full @(isMapPage ? "max-w-[1920px] mx-auto px-2 sm:px-4 lg:px-6 py-2 overflow-hidden flex flex-col pb-16 md:pb-2" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-6")">
         @RenderBody()
     </main>
 

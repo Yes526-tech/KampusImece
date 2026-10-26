@@ -503,19 +503,26 @@
                     attribution: '© OpenStreetMap'
                 }).addTo(map);
 
-                const pinHtml = `@(isCompleted ? "<div class='w-8 h-8 rounded-full bg-emerald-700 border-2 border-white text-white flex items-center justify-center shadow-lg'><i data-lucide='check' class='w-4 h-4'></i></div>" : "<div class='w-8 h-8 rounded-full bg-emerald-600 border-2 border-white text-white flex items-center justify-center shadow-lg'><i data-lucide='trees' class='w-4 h-4'></i></div>")`;
+                const isCompletedStatus = @(isCompleted ? "true" : "false");
+                const pinBg = isCompletedStatus ? "bg-emerald-700" : "bg-emerald-600";
+                const pinIcon = isCompletedStatus ? "check" : "map-pin";
 
-                const icon = L.divIcon({
+                const customIcon = L.divIcon({
                     className: 'detail-pin',
-                    html: pinHtml,
+                    html: `<div class="w-8 h-8 rounded-full ${pinBg} border-2 border-white text-white flex items-center justify-center shadow-lg"><i data-lucide="${pinIcon}" class="w-4 h-4"></i></div>`,
                     iconSize: [32, 32],
                     iconAnchor: [16, 16]
                 });
 
-                L.marker([EVENT_LAT, EVENT_LNG], { icon: icon })
+                const eventTitleStr = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Title));
+                const eventLocStr = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LocationName));
+
+                L.marker([EVENT_LAT, EVENT_LNG], { icon: customIcon })
                     .addTo(map)
-                    .bindPopup('<strong>@System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Model.Title)</strong><br/><span class="text-xs text-slate-500">@System.Text.Encodings.Web.JavaScriptEncoder.Default.Encode(Model.LocationName)</span>')
+                    .bindPopup(`<strong>${eventTitleStr}</strong><br/><span class="text-xs text-slate-500">${eventLocStr}</span>`)
                     .openPopup();
+
+                if (window.lucide) lucide.createIcons();
 
                 setTimeout(() => map.invalidateSize(), 250);
             }

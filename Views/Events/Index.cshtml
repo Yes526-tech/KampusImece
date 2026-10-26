@@ -8,10 +8,10 @@
 <div class="flex flex-col h-full min-h-0 overflow-hidden">
 
     <!-- ÜST KONTROL & MODERN SEGMENTED FİLTRE ÇUBUĞU -->
-    <div class="mb-2 sm:mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
+    <div class="mb-2 sm:mb-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2 shrink-0">
         
-        <!-- Modern Segmented Pill Filtreler -->
-        <div class="p-1 bg-slate-200/60 dark:bg-slate-900/80 rounded-2xl border border-slate-300/40 dark:border-slate-800 backdrop-blur-md shadow-inner flex items-center gap-1 overflow-x-auto max-w-full scrollbar-none">
+        <!-- Modern Segmented Pill Filtreler: SADECE Tümü, Açık, Az Kalan, Dolu -->
+        <div class="p-1 bg-slate-200/60 dark:bg-slate-900/80 rounded-2xl border border-slate-300/40 dark:border-slate-800 backdrop-blur-md shadow-inner flex items-center gap-1 overflow-x-auto max-w-full scrollbar-none shrink-0">
             <button type="button" 
                     data-filter="all" 
                     class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap bg-white dark:bg-emerald-600 text-emerald-800 dark:text-white shadow-sm border border-slate-200/60 dark:border-transparent">
@@ -22,25 +22,19 @@
                     data-filter="open" 
                     class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800">
                 <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
-                <span>Açık Kontenjan</span>
+                <span>Açık</span>
             </button>
             <button type="button" 
-                    data-filter="completed" 
+                    data-filter="almost-full" 
                     class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800">
-                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
-                <span>Temizlenenler ✨</span>
+                <i data-lucide="hourglass" class="w-3.5 h-3.5 text-amber-500"></i>
+                <span>Az Kalan</span>
             </button>
             <button type="button" 
-                    data-filter="yurt" 
+                    data-filter="full" 
                     class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800">
-                <i data-lucide="home" class="w-3.5 h-3.5 text-blue-500 dark:text-blue-400"></i>
-                <span>Yurt Yolu</span>
-            </button>
-            <button type="button" 
-                    data-filter="fakulte" 
-                    class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800">
-                <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-purple-500 dark:text-purple-400"></i>
-                <span>Fakülteler</span>
+                <i data-lucide="lock" class="w-3.5 h-3.5 text-slate-500"></i>
+                <span>Dolu</span>
             </button>
         </div>
 
@@ -70,12 +64,12 @@
 
     <!-- ANA GÖVDE: SPLIT VIEW (SOL: SABİT CANLI HARİTA, SAĞ: AŞAĞI KAYAN 3x3 / 4x4 KARTLAR) -->
     <!-- MOBİLDE: HARİTA VE İLANLAR SEKME OLARAK ÇALIŞIR, TAŞMA OLMADAN EKRANI KAPLAR -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 min-h-0 items-stretch overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0 items-stretch overflow-hidden">
 
         <!-- SOL: SABİT CANLI HARİTA (Mobilde Harita Seçilince Ekranı Tam Kaplar, Masaüstünde Sabit Bölüm) -->
-        <div id="mobileMapWrapper" class="col-span-1 lg:col-span-4 xl:col-span-4 2xl:col-span-3 flex lg:flex flex-col h-[calc(100dvh-8rem)] lg:h-full min-h-0 shrink-0">
-            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2.5 shadow-sm transition-colors flex flex-col h-full min-h-0">
-                <div class="flex items-center justify-between px-2.5 py-1 mb-1 text-xs shrink-0">
+        <div id="mobileMapWrapper" class="col-span-1 lg:col-span-4 xl:col-span-4 2xl:col-span-3 flex lg:flex flex-col h-full min-h-0 shrink-0">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2 shadow-sm transition-colors flex flex-col h-full min-h-0 overflow-hidden">
+                <div class="flex items-center justify-between px-2 py-1 mb-1 text-xs shrink-0">
                     <div class="flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span class="font-semibold text-slate-800 dark:text-slate-100">Kampüs Canlı Haritası</span>
@@ -83,17 +77,20 @@
                     <div class="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Açık</span>
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Az Kaldı</span>
-                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-700"></span> Bitti</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-600"></span> Dolu</span>
                     </div>
                 </div>
 
                 <!-- Leaflet Container: Harita ekrana tam oturur -->
                 <div id="campusLiveMap" class="flex-1 w-full rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 min-h-0"></div>
 
-                <div class="px-2.5 pt-1.5 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 shrink-0">
+                <div class="px-2 pt-1.5 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 shrink-0">
                     <span>Alaaddin Keykubat Kampüsü</span>
                     <div class="flex items-center gap-2 text-[10px]">
-                        <span>Sabit Harita</span>
+                        <button type="button" onclick="window.toggleMapDragging && window.toggleMapDragging()" id="mapLockBadge" class="flex items-center gap-1 text-[10px] text-slate-500 dark:text-slate-400 hover:text-emerald-600 transition" title="Harita Sabitleme / Serbest Bırakma">
+                            <i data-lucide="lock" class="w-3 h-3 text-emerald-600 dark:text-emerald-400"></i>
+                            <span>Sabit Harita</span>
+                        </button>
                         <span>·</span>
                         <button type="button" onclick="openGlobalKvkkModal('kvkk')" class="hover:underline">KVKK</button>
                     </div>
@@ -102,8 +99,8 @@
         </div>
 
         <!-- SAĞ: ETKİNLİK KARTLARI (Mobilde İlanlar Seçilince Gösterilir, Masaüstünde 3x3 / 4x4 Izgara) -->
-        <div id="mobileCardsWrapper" class="col-span-1 lg:col-span-8 xl:col-span-8 2xl:col-span-9 hidden lg:flex flex-col h-[calc(100dvh-8.5rem)] lg:h-full min-h-0 overflow-hidden">
-            <div id="loadingIndicator" class="hidden py-8 text-center shrink-0">
+        <div id="mobileCardsWrapper" class="col-span-1 lg:col-span-8 xl:col-span-8 2xl:col-span-9 hidden lg:flex flex-col h-full min-h-0 overflow-hidden">
+            <div id="loadingIndicator" class="hidden py-6 text-center shrink-0">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 shadow-sm">
                     <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-emerald-600"></i>
                     <span>Noktalar yükleniyor...</span>
@@ -111,7 +108,7 @@
             </div>
 
             <!-- Kart Listesi (Mobilde ve Masaüstünde İçten Kaydırılabilir 3'lü/4'lü Izgara) -->
-            <div id="eventsListContainer" class="flex-1 min-h-0 overflow-y-auto pr-0 lg:pr-2 pb-24 lg:pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5 scrollbar-thin">
+            <div id="eventsListContainer" class="flex-1 min-h-0 overflow-y-auto pr-0 lg:pr-1 pb-16 lg:pb-2 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3 scrollbar-thin">
                 <!-- JavaScript (app.js) tarafından doldurulur -->
             </div>
         </div>

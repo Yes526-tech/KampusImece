@@ -102,14 +102,18 @@ const KampusImeceApp = {
         }
     },
 
-    // 1. ANA CANLI HARİTA BAŞLATMA
+    // 1. ANA CANLI HARİTA BAŞLATMA (Tam Sabit, Sürükleme ve Taşma Olmayan Harita)
     initMainMap: function () {
         const mapContainer = document.getElementById('campusLiveMap');
         if (!mapContainer) return;
 
         this.map = L.map('campusLiveMap', {
             zoomControl: true,
-            scrollWheelZoom: true
+            scrollWheelZoom: false,
+            dragging: false,       // Harita sürüklenip kaymasın, sabit dursun
+            touchZoom: false,
+            doubleClickZoom: false,
+            boxZoom: false
         }).setView(this.campusCenter, this.defaultZoom);
 
         // Açık kaynak OpenStreetMap katmanı
@@ -120,6 +124,25 @@ const KampusImeceApp = {
 
         this.markersLayer = L.layerGroup().addTo(this.map);
         this.eventMarkers = {};
+
+        // Harita Sürükleme Kilidi (İsteğe bağlı açıp kapatma)
+        window.toggleMapDragging = () => {
+            if (!this.map) return;
+            const isDragging = this.map.dragging.enabled();
+            if (isDragging) {
+                this.map.dragging.disable();
+                this.map.touchZoom.disable();
+                this.map.scrollWheelZoom.disable();
+                const badge = document.getElementById('mapLockBadge');
+                if (badge) badge.innerHTML = '<i data-lucide="lock" class="w-3 h-3 text-emerald-600 dark:text-emerald-400"></i><span>Sabit Harita</span>';
+            } else {
+                this.map.dragging.enable();
+                this.map.touchZoom.enable();
+                const badge = document.getElementById('mapLockBadge');
+                if (badge) badge.innerHTML = '<i data-lucide="unlock" class="w-3 h-3 text-amber-500"></i><span>Serbest</span>';
+            }
+            if (window.lucide) lucide.createIcons();
+        };
 
         setTimeout(() => {
             if (this.map) this.map.invalidateSize();
@@ -211,18 +234,18 @@ const KampusImeceApp = {
 
     applyFilters: function () {
         this.filteredEvents = this.events.filter(ev => {
-            // 1. Kategori Filtresi
-            let categoryMatch = true;
-            if (this.activeFilter === 'yurt') {
-                const combined = (ev.title + ' ' + ev.locationName).toLowerCase();
-                categoryMatch = combined.includes('yurt') || combined.includes('kyk');
-            } else if (this.activeFilter === 'fakulte') {
-                const combined = (ev.title + ' ' + ev.locationName).toLowerCase();
-                categoryMatch = combined.includes('fakült') || combined.includes('mühendislik') || combined.includes('teknoloji');
-            } else if (this.activeFilter === 'open') {
-                categoryMatch = !ev.isQuotaFull && ev.status === 0;
-            } else if (this.activeFilter === 'completed') {
-                categoryMatch = ev.status === 2; // 2 = EventStatus.Completed
+            const isCompleted = ev.status === 2;
+            const isFull = ev.isQuotaFull || ev.status === 1;
+            const remaining = Math.max(0, ev.requiredVolunteers - ev.currentParticipantsCount);
+
+            // 1. Durum / Sekme Filtresi (SADECE Tümü, Açık, Az Kalan, Dolu)
+            let statusMatch = true;
+            if (this.activeFilter === 'open') {
+                statusMatch = !isFull && !isCompleted;
+            } else if (this.activeFilter === 'almost-full') {
+                statusMatch = !isFull && !isCompleted && remaining <= 2 && remaining > 0;
+            } else if (this.activeFilter === 'full') {
+                statusMatch = isFull || isCompleted;
             }
 
             // 2. Arama Kelimesi Filtresi
@@ -232,12 +255,16 @@ const KampusImeceApp = {
                 searchMatch = combined.includes(this.searchTerm);
             }
 
-            return categoryMatch && searchMatch;
+            return statusMatch && searchMatch;
         });
 
         this.renderMap(this.filteredEvents);
         this.renderCards(this.filteredEvents);
         this.updateStatsCounters(this.filteredEvents);
+
+        if (this.map) {
+            setTimeout(() => this.map.invalidateSize(), 100);
+        }
     },
 
     // 4. CANLI HARİTA PİNLERİNİ GÜNCELLEME (PARLAYAN YEŞİL ONAY PİNİ DAHİL)
