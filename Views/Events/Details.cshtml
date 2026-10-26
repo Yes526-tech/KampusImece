@@ -296,6 +296,15 @@
                         </button>
                     }
                 }
+                else if (isFull && !hasJoined)
+                {
+                    <button type="button" 
+                            disabled 
+                            class="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-medium text-xs flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 cursor-not-allowed">
+                        <i data-lucide="lock" class="w-4 h-4"></i>
+                        <span>Kontenjan Dolmuştur</span>
+                    </button>
+                }
                 else if (!User.Identity?.IsAuthenticated == true)
                 {
                     <a href="/Auth/Login" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95">

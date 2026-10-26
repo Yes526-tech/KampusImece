@@ -266,9 +266,9 @@ const KampusImeceApp = {
         if (headingEl) {
             const headings = {
                 'all': 'Tüm Kampüs İlanları',
-                'open': 'Açık İlanlar (Gönüllü Bekleyen)',
-                'almost-full': 'Az Kalan İlanlar (Son 1-2 Kişi)',
-                'full': 'Dolu ve Tamamlanan İlanlar'
+                'open': 'Açık İlanlar',
+                'almost-full': 'Az Kalan İlanlar',
+                'full': 'Dolu İlanlar'
             };
             headingEl.textContent = headings[this.activeFilter] || 'Kampüs İlanları';
         }
@@ -463,23 +463,6 @@ const KampusImeceApp = {
             statusBadge = `<span class="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-emerald-600/90 text-white backdrop-blur shadow-sm whitespace-nowrap">${remaining} Kişi</span>`;
         }
 
-        // Katılımcı Avatarları
-        let avatarsHtml = `<div class="flex items-center -space-x-1.5 overflow-hidden shrink-0">`;
-        (ev.participantsList || []).slice(0, 3).forEach(p => {
-            avatarsHtml += `
-                <div title="${this.escapeHtml(p.fullName)}" 
-                     class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[9px] font-bold ring-2 ring-white dark:ring-slate-900">
-                    ${this.escapeHtml(p.initials)}
-                </div>`;
-        });
-        if (ev.participantsList && ev.participantsList.length > 3) {
-            avatarsHtml += `
-                <div class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[9px] font-bold ring-2 ring-white dark:ring-slate-900">
-                    +${ev.participantsList.length - 3}
-                </div>`;
-        }
-        avatarsHtml += `</div>`;
-
         // BUTON EYLEMLERİ (Net, Tekil, Taşmayan ve İç İçe Girmeyen Yapı)
         let actionBtnHtml = '';
         if (isCompleted) {
@@ -504,12 +487,6 @@ const KampusImeceApp = {
                         <span>Temizlik Tamamlandı</span>
                     </div>`;
             }
-        } else if (!isAuth) {
-            actionBtnHtml = `
-                <a href="/Auth/Login" onclick="event.stopPropagation();" class="w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
-                    <i data-lucide="log-in" class="w-3.5 h-3.5 shrink-0"></i>
-                    <span>Giriş Yap ve Katıl</span>
-                </a>`;
         } else if (ev.isCreator) {
             // İLAN SAHİBİ: Yan yana 2 buton (asla iç içe geçmeyen, taşmayan)
             actionBtnHtml = `
@@ -552,6 +529,7 @@ const KampusImeceApp = {
                         <span>Katılımı İptal Et</span>
                     </button>`}`;
         } else if (isFull) {
+            // DOLU OLAN İLANLAR: KAYIT YAPTIRILMAYACAK (GİRİŞ YAPMIŞ VEYA YAPMAMIŞ HERKES İÇİN KONTENJAN DOLDU)
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation();" 
@@ -560,6 +538,12 @@ const KampusImeceApp = {
                     <i data-lucide="lock" class="w-3.5 h-3.5 shrink-0"></i>
                     <span>Kontenjan Doldu</span>
                 </button>`;
+        } else if (!isAuth) {
+            actionBtnHtml = `
+                <a href="/Auth/Login" onclick="event.stopPropagation();" class="w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+                    <i data-lucide="log-in" class="w-3.5 h-3.5 shrink-0"></i>
+                    <span>Giriş Yap ve Katıl</span>
+                </a>`;
         } else {
             actionBtnHtml = `
                 <button type="button" 
@@ -568,21 +552,6 @@ const KampusImeceApp = {
                     <i data-lucide="hand" class="w-3.5 h-3.5 shrink-0"></i>
                     <span>Katılıyorum (+1)</span>
                 </button>`;
-        }
-
-        // Tamamlanma Notu
-        let completionNoteHtml = '';
-        if (isCompleted) {
-            completionNoteHtml = `
-                <div class="mb-3 p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50">
-                    <div class="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 mb-1">
-                        <i data-lucide="check-check" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
-                        <span>Temizlik Özeti</span>
-                    </div>
-                    <p class="text-[11px] text-emerald-700 dark:text-emerald-400 italic line-clamp-2">
-                        "${this.escapeHtml(ev.completionNote || 'Atıklar toplandı ve geri dönüşüme teslim edildi.')}"
-                    </p>
-                </div>`;
         }
 
         // Öncesi / Sonrası Butonları
@@ -651,57 +620,37 @@ const KampusImeceApp = {
                     ${beforeAfterToggleHtml}
                 </div>
 
-                <!-- KART GÖVDESİ (HER BİLGİ NET, FERAH & KESİNTİSİZ) -->
-                <div class="p-3 flex-1 flex flex-col justify-between">
-                    <div>
-                        <!-- Başlık & Detay Oku (2 satıra kadar net okunaklı, boy hizalı) -->
-                        <div class="flex items-start justify-between gap-1.5 min-h-[2.25rem]">
-                            <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title="${this.escapeHtml(ev.title)}">
-                                ${this.escapeHtml(ev.title)}
-                            </h4>
-                            <span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold shrink-0 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 pt-0.5 whitespace-nowrap">
-                                Detay <i data-lucide="chevron-right" class="w-3 h-3"></i>
-                            </span>
-                        </div>
-                        <!-- Açıklama (Her detay rahatça okunur) -->
-                        <p class="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mt-1 mb-2.5 min-h-[1.8rem]">
-                            ${this.escapeHtml(ev.description || 'Açıklama belirtilmedi.')}
-                        </p>
+                <!-- KART GÖVDESİ (TÜM İLANLARDA EŞİT YÜKSEKLİK VE TEK DİZAYN) -->
+                <div class="p-3.5 flex-1 flex flex-col justify-between">
+                    <!-- SADECE BAŞLIK VE DETAY OKU (Metin ve alt kişiler kaldırıldı) -->
+                    <div class="min-h-[2.5rem] flex items-start justify-between gap-1.5 mb-2.5">
+                        <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title="${this.escapeHtml(ev.title)}">
+                            ${this.escapeHtml(ev.title)}
+                        </h4>
+                        <span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold shrink-0 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 pt-0.5 whitespace-nowrap">
+                            Detay <i data-lucide="chevron-right" class="w-3 h-3"></i>
+                        </span>
                     </div>
 
-                    <div>
-                        <!-- İLERLEME ÇUBUĞU (Ferah & Net) -->
-                        ${!isCompleted ? `
-                            <div class="mb-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
-                                <div class="flex items-center justify-between text-[11px] mb-1">
-                                    <span class="flex items-center gap-1 text-slate-500 dark:text-slate-400">
-                                        <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
-                                        <span>Gönüllü Katılımı</span>
-                                    </span>
-                                    <span class="font-bold ${isFull ? 'text-amber-500' : 'text-slate-700 dark:text-slate-200'}">
-                                        ${ev.currentParticipantsCount} / ${ev.requiredVolunteers}
-                                    </span>
-                                </div>
-                                <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div class="h-full rounded-full transition-all duration-300 ${isFull ? 'bg-amber-500' : 'bg-emerald-500'}" style="width: ${percent}%"></div>
-                                </div>
-                            </div>` : ''}
-
-                        <!-- Tamamlanma Rapor Notu -->
-                        ${completionNoteHtml}
-
-                        <!-- Katılımcılar & İlan Sahibi (Taşmayan, Net Çizgi) -->
-                        <div class="flex items-center justify-between mb-2.5 text-[11px] pt-1 border-t border-slate-100 dark:border-slate-800/80">
-                            <div class="flex items-center gap-1.5 min-w-0">
-                                ${avatarsHtml}
-                                <span class="text-slate-500 dark:text-slate-400 text-[10px] truncate">${ev.currentParticipantsCount} kişi</span>
+                    <!-- ALT ALAN: STANDART İLERLEME ÇUBUĞU VE AKSİYON BUTONU -->
+                    <div class="mt-auto space-y-2.5">
+                        <!-- İLERLEME ÇUBUĞU (Her sekmede ve her kartta standart) -->
+                        <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                            <div class="flex items-center justify-between text-[11px] mb-1">
+                                <span class="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                                    <i data-lucide="${isCompleted ? 'sparkles' : 'users'}" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
+                                    <span>${isCompleted ? 'Temizlik Durumu' : 'Gönüllü Katılımı'}</span>
+                                </span>
+                                <span class="font-bold ${isCompleted ? 'text-emerald-600 dark:text-emerald-400' : (isFull ? 'text-amber-500' : 'text-slate-700 dark:text-slate-200')}">
+                                    ${isCompleted ? 'Tamamlandı' : `${ev.currentParticipantsCount} / ${ev.requiredVolunteers}`}
+                                </span>
                             </div>
-                            <span class="text-slate-500 dark:text-slate-400 text-[10px] shrink-0">
-                                İlan: <strong class="text-slate-700 dark:text-slate-200 font-semibold">${this.escapeHtml((ev.creatorName || '').split(' ')[0])}</strong>
-                            </span>
+                            <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                <div class="h-full rounded-full transition-all duration-300 ${isCompleted ? 'bg-emerald-600' : (isFull ? 'bg-amber-500' : 'bg-emerald-500')}" style="width: ${isCompleted ? 100 : percent}%"></div>
+                            </div>
                         </div>
 
-                        <!-- Butonlar (Geniş, Rahat Tıklanır, Asla İç İçe Geçmeyen) -->
+                        <!-- AKSİYON BUTONLARI -->
                         <div>
                             ${actionBtnHtml}
                         </div>

@@ -507,7 +507,7 @@ public class EventsController : Controller
             else
             {
                 // KULLANICI KATILIYOR (JOIN)
-                if (targetEvent.Participations.Count >= targetEvent.RequiredVolunteers)
+                if (targetEvent.Status == EventStatus.QuotaFull || targetEvent.Participations.Count >= targetEvent.RequiredVolunteers)
                 {
                     targetEvent.Status = EventStatus.QuotaFull;
                     await _context.SaveChangesAsync();
