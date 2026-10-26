@@ -121,7 +121,10 @@
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between gap-2 flex-wrap mb-1">
                                 <h4 class="text-sm font-bold text-emerald-900 dark:text-emerald-200">Temizlik İmecesi Başarıyla Tamamlandı!</h4>
-                                <span class="px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white text-[11px] font-bold">+30 Puan Kazanıldı</span>
+                                @if (hasJoined || isCreator)
+                                {
+                                    <span class="px-2.5 py-0.5 rounded-lg bg-emerald-600 text-white text-[11px] font-bold">+30 Puan Kazandınız</span>
+                                }
                             </div>
                             <p class="text-xs text-emerald-800 dark:text-emerald-300 leading-relaxed mb-3">
                                 @(string.IsNullOrWhiteSpace(Model.CompletionNote) ? "Gönüllü öğrencilerimiz bir araya gelerek kirlilik alanını tamamen temizlemiş ve çevreye kazandırmıştır." : Model.CompletionNote)
@@ -151,16 +154,16 @@
                 <div id="detailSpotMap" class="w-full h-64 rounded-xl border border-slate-100 dark:border-slate-800 overflow-hidden"></div>
 
                 <div class="mt-3 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
-                    <span class="flex items-center gap-1">
+                    <span class="flex items-center gap-1 font-medium">
                         <i data-lucide="map" class="w-3.5 h-3.5 text-emerald-600"></i>
                         <span>Alaaddin Keykubat Kampüsü</span>
                     </span>
                     <a href="https://www.google.com/maps/dir/?api=1&destination=@Model.Latitude.ToString(System.Globalization.CultureInfo.InvariantCulture),@Model.Longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)" 
                        target="_blank" 
                        rel="noopener noreferrer" 
-                       class="text-emerald-600 dark:text-emerald-400 hover:underline font-semibold flex items-center gap-1">
+                       class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition active:scale-95">
+                        <i data-lucide="navigation" class="w-3.5 h-3.5"></i>
                         <span>Yol Tarifi Al</span>
-                        <i data-lucide="external-link" class="w-3.5 h-3.5"></i>
                     </a>
                 </div>
             </div>
@@ -276,7 +279,14 @@
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm transition-colors space-y-3">
                 <h4 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2">Etkinlik İşlemleri</h4>
 
-                @if (!User.Identity?.IsAuthenticated == true)
+                @if (isCompleted)
+                {
+                    <div class="w-full py-3 px-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-2 border border-emerald-200 dark:border-emerald-800">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+                        <span>Bu temizlik görevi tamamlanmıştır. Teşekkürler!</span>
+                    </div>
+                }
+                else if (!User.Identity?.IsAuthenticated == true)
                 {
                     <a href="/Auth/Login" class="w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
                         <i data-lucide="log-in" class="w-4 h-4"></i>
@@ -285,15 +295,6 @@
                 }
                 else
                 {
-                    @if (isCompleted)
-                    {
-                        <div class="w-full py-3 px-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-2 border border-emerald-200 dark:border-emerald-800">
-                            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-                            <span>Bu temizlik görevi tamamlanmıştır. Teşekkürler!</span>
-                        </div>
-                    }
-                    else
-                    {
                         <!-- KATIL / AYRIL BUTONU -->
                         <div class="space-y-2">
                             @if (hasJoined)
@@ -334,7 +335,7 @@
                                     onclick="openDetailsCompleteModal()" 
                                     class="w-full py-2.5 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
                                 <i data-lucide="camera" class="w-4 h-4"></i>
-                                <span>Temizliği Kanıtla & Tamamla (+30 Puan)</span>
+                                <span>Temizliği Kanıtla & Tamamla</span>
                             </button>
                         }
 
@@ -349,7 +350,6 @@
                             </button>
                         }
                     }
-                }
 
                 <!-- ŞİKAYET ET / RAPORLA -->
                 <button type="button" 

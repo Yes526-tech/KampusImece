@@ -433,7 +433,7 @@ const KampusImeceApp = {
                 actionBtnHtml = `
                     <div class="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1.5 border border-emerald-200 dark:border-emerald-800">
                         <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
-                        <span>Temizlik Tamamlandı (+30 Puan)</span>
+                        <span>Temizlik Tamamlandı</span>
                     </div>`;
             } else if (!isAuth) {
                 actionBtnHtml = `
@@ -637,6 +637,23 @@ const KampusImeceApp = {
                 </div>
             `;
         });
+
+        // İlan akışının en altına temiz footer ekle
+        html += `
+            <div class="col-span-full pt-8 pb-8 text-center text-xs text-slate-400 dark:text-slate-500 border-t border-slate-200/60 dark:border-slate-800 mt-6">
+                <div class="flex items-center justify-center gap-2 mb-1.5 font-medium">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <span>© 2026 Kampüsİmece — Selçuk Üniversitesi Topluma Hizmet Projesi</span>
+                </div>
+                <div class="flex items-center justify-center gap-3 text-[11px]">
+                    <button type="button" onclick="openGlobalKvkkModal('kvkk')" class="hover:underline">KVKK Aydınlatma</button>
+                    <span>·</span>
+                    <button type="button" onclick="openGlobalKvkkModal('consent')" class="hover:underline">Açık Rıza</button>
+                    <span>·</span>
+                    <button type="button" onclick="openGlobalKvkkModal('cookie')" class="hover:underline">Çerezler</button>
+                </div>
+            </div>
+        `;
 
         container.innerHTML = html;
         if (window.lucide) lucide.createIcons();

@@ -267,9 +267,14 @@
             window.showToast("KVKK sözleşmesini onaylamadan kayıt olamazsınız.", "error");
         }
 
-        // Form submit kontrolü: KVKK onaylanmadıysa modalı aç ve engelle
+        // Form submit kontrolü: Değerleri kırp ve KVKK onaylanmadıysa modalı aç ve engelle
         if (registerForm) {
             registerForm.addEventListener('submit', function (e) {
+                const inputs = registerForm.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"]');
+                inputs.forEach(input => {
+                    input.value = input.value.trim();
+                });
+
                 if (!acceptKvkkCheckbox || !acceptKvkkCheckbox.checked) {
                     e.preventDefault();
                     if (kvkkErrorMsg) kvkkErrorMsg.classList.remove('hidden');

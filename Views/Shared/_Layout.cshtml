@@ -193,12 +193,12 @@
     </header>
 
     <!-- ANA İÇERİK ALANI -->
-    <main class="flex-1 min-h-0 w-full @(isMapPage ? "max-w-[1920px] mx-auto px-2 sm:px-4 lg:px-6 py-2 overflow-hidden flex flex-col pb-16 md:pb-2" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-6")">
+    <main class="w-full @(isMapPage ? "flex-1 min-h-0 max-w-[1920px] mx-auto px-2 sm:px-4 lg:px-6 py-2 overflow-hidden flex flex-col pb-16 md:pb-2" : "flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20 md:pb-8")">
         @RenderBody()
     </main>
 
-    <!-- MINIMALIST FOOTER -->
-    <footer class="@(isMapPage ? "hidden" : "border-t border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-900 mt-auto transition-colors pb-20 md:pb-0")">
+    <!-- MINIMALIST FOOTER (HER ZAMAN EN ALTTA) -->
+    <footer class="@(isMapPage ? "hidden" : "border-t border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-900 mt-auto transition-colors pb-24 md:pb-0 shrink-0")">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
                 <div class="flex items-center gap-2">

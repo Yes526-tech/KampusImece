@@ -101,6 +101,17 @@
             }
             if (window.lucide) lucide.createIcons();
         }
+
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function () {
+                const emailInput = document.getElementById('loginEmail');
+                if (emailInput) {
+                    emailInput.value = emailInput.value.trim();
+                }
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             if (window.lucide) lucide.createIcons();
         });
