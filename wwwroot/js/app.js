@@ -125,6 +125,12 @@ const KampusImeceApp = {
         this.markersLayer = L.layerGroup().addTo(this.map);
         this.eventMarkers = {};
 
+        // Harita hareket ve sürükleme kabiliyetlerini güvence altına al
+        if (this.map.dragging) this.map.dragging.enable();
+        if (this.map.touchZoom) this.map.touchZoom.enable();
+        if (this.map.doubleClickZoom) this.map.doubleClickZoom.enable();
+        if (this.map.scrollWheelZoom) this.map.scrollWheelZoom.enable();
+
         setTimeout(() => {
             if (this.map) this.map.invalidateSize();
         }, 200);
@@ -537,10 +543,10 @@ const KampusImeceApp = {
             html += `
                 <div id="event-card-${ev.id}" 
                      onclick="window.location.href='/Events/Details/${ev.id}'" 
-                     class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all duration-200 flex flex-col overflow-hidden group cursor-pointer active:scale-[0.99]">
-                    <!-- ÜST RESİM VE ROZETLER -->
-                    <div class="relative h-36 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                        <img id="event-img-${ev.id}" src="${displayImageUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${this.escapeHtml(ev.title)}" />
+                     class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all duration-200 flex flex-col overflow-hidden group cursor-pointer active:scale-[0.99] w-full max-w-md sm:max-w-none mx-auto">
+                    <!-- ÜST RESİM VE ROZETLER (KARE & FERAH MİMARİ) -->
+                    <div class="relative w-full aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                        <img id="event-img-${ev.id}" src="${displayImageUrl}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" alt="${this.escapeHtml(ev.title)}" />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
 
                         <!-- Sol Üst: Konum (Taşmayan, Temiz Etiket) -->

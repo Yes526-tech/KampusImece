@@ -12,7 +12,7 @@ RUN dotnet publish "KampusImece.csproj" -c Release -o /app/publish /p:UseAppHost
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 EXPOSE 8080
-ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 10000
 ENV ASPNETCORE_ENVIRONMENT=Production
 
 COPY --from=build /app/publish .

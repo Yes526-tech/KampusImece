@@ -4,7 +4,7 @@
     var isMapPage = activeController == "Events" && activeAction == "Index";
 }
 <!DOCTYPE html>
-<html lang="tr" class="h-full @(isMapPage ? "overflow-hidden" : "")">
+<html lang="tr" class="@(isMapPage ? "h-full overflow-hidden" : "min-h-full")">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -66,18 +66,22 @@
         .dark .leaflet-tile-pane {
             filter: brightness(0.85) contrast(1.1);
         }
-        /* Harita menüsünde sayfa kaymasını ve çift dokunma zıplamasını engelle */
-        html, body {
-            overscroll-behavior: none;
-        }
-        #campusLiveMap, .leaflet-container {
-            touch-action: none !important;
-            user-select: none;
-            -webkit-user-select: none;
+        @if (isMapPage) {
+            <text>
+            /* Harita sayfasında pencere kaymasını ve çift dokunma zıplamasını engelle */
+            html, body {
+                overscroll-behavior: none;
+            }
+            #campusLiveMap {
+                touch-action: none !important;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+            </text>
         }
     </style>
 </head>
-<body data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" class="flex flex-col h-full h-[100dvh] font-sans antialiased text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 selection:bg-emerald-500 selection:text-white transition-colors duration-200 @(isMapPage ? "overflow-hidden" : "min-h-full")">
+<body data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" class="flex flex-col font-sans antialiased text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 selection:bg-emerald-500 selection:text-white transition-colors duration-200 @(isMapPage ? "h-full h-[100dvh] overflow-hidden" : "min-h-screen")">
 
     <!-- MODERN YEŞİL & BEYAZ NAVBAR -->
     <header class="sticky top-0 z-50 w-full shrink-0 h-16 bg-emerald-600 dark:bg-[#064e3b] border-b border-emerald-500/40 dark:border-emerald-900/60 shadow-sm transition-colors text-white">
@@ -194,7 +198,7 @@
     </main>
 
     <!-- MINIMALIST FOOTER -->
-    <footer class="@(isMapPage ? "hidden" : "border-t border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-900 mt-auto transition-colors")">
+    <footer class="@(isMapPage ? "hidden" : "border-t border-slate-200/70 dark:border-slate-800 bg-white dark:bg-slate-900 mt-auto transition-colors pb-20 md:pb-0")">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500 dark:text-slate-400">
                 <div class="flex items-center gap-2">

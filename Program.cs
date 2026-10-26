@@ -9,6 +9,15 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Render / Bulut Sunucu Dinamik Port Yapılandırması
+var port = Environment.GetEnvironmentVariable("PORT");
+if (!string.IsNullOrEmpty(port))
+{
+    builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+    Environment.SetEnvironmentVariable("ASPNETCORE_HTTP_PORTS", port);
+    Environment.SetEnvironmentVariable("ASPNETCORE_URLS", $"http://0.0.0.0:{port}");
+}
+
 // 1. Controller & View Servisleri
 builder.Services.AddControllersWithViews();
 
