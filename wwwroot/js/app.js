@@ -102,18 +102,18 @@ const KampusImeceApp = {
         }
     },
 
-    // 1. ANA CANLI HARİTA BAŞLATMA (Tam Sabit, Sürükleme ve Taşma Olmayan Harita)
+    // 1. ANA CANLI HARİTA BAŞLATMA (İçinde Serbestçe Kaydırılabilen, Sayfayı Asla Kaydırmayan Harita)
     initMainMap: function () {
         const mapContainer = document.getElementById('campusLiveMap');
         if (!mapContainer) return;
 
         this.map = L.map('campusLiveMap', {
             zoomControl: true,
-            scrollWheelZoom: false,
-            dragging: false,       // Harita sürüklenip kaymasın, sabit dursun
-            touchZoom: false,
-            doubleClickZoom: false,
-            boxZoom: false
+            scrollWheelZoom: true,
+            dragging: true,        // Harita içinde serbestçe sürüklenebilir / kaydırılabilir
+            touchZoom: true,       // Mobilde iki parmakla yakınlaştırma/uzaklaştırma
+            doubleClickZoom: true, // Çift tıklamayla yakınlaştırma
+            boxZoom: true
         }).setView(this.campusCenter, this.defaultZoom);
 
         // Açık kaynak OpenStreetMap katmanı
@@ -124,25 +124,6 @@ const KampusImeceApp = {
 
         this.markersLayer = L.layerGroup().addTo(this.map);
         this.eventMarkers = {};
-
-        // Harita Sürükleme Kilidi (İsteğe bağlı açıp kapatma)
-        window.toggleMapDragging = () => {
-            if (!this.map) return;
-            const isDragging = this.map.dragging.enabled();
-            if (isDragging) {
-                this.map.dragging.disable();
-                this.map.touchZoom.disable();
-                this.map.scrollWheelZoom.disable();
-                const badge = document.getElementById('mapLockBadge');
-                if (badge) badge.innerHTML = '<i data-lucide="lock" class="w-3 h-3 text-emerald-600 dark:text-emerald-400"></i><span>Sabit Harita</span>';
-            } else {
-                this.map.dragging.enable();
-                this.map.touchZoom.enable();
-                const badge = document.getElementById('mapLockBadge');
-                if (badge) badge.innerHTML = '<i data-lucide="unlock" class="w-3 h-3 text-amber-500"></i><span>Serbest</span>';
-            }
-            if (window.lucide) lucide.createIcons();
-        };
 
         setTimeout(() => {
             if (this.map) this.map.invalidateSize();

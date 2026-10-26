@@ -66,9 +66,18 @@
         .dark .leaflet-tile-pane {
             filter: brightness(0.85) contrast(1.1);
         }
+        /* Harita menüsünde sayfa kaymasını ve çift dokunma zıplamasını engelle */
+        html, body {
+            overscroll-behavior: none;
+        }
+        #campusLiveMap, .leaflet-container {
+            touch-action: none !important;
+            user-select: none;
+            -webkit-user-select: none;
+        }
     </style>
 </head>
-<body data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" class="flex flex-col h-full font-sans antialiased text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 selection:bg-emerald-500 selection:text-white transition-colors duration-200 @(isMapPage ? "overflow-hidden" : "min-h-full")">
+<body data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" class="flex flex-col h-full h-[100dvh] font-sans antialiased text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 selection:bg-emerald-500 selection:text-white transition-colors duration-200 @(isMapPage ? "overflow-hidden" : "min-h-full")">
 
     <!-- MODERN YEŞİL & BEYAZ NAVBAR -->
     <header class="sticky top-0 z-50 w-full shrink-0 h-16 bg-emerald-600 dark:bg-[#064e3b] border-b border-emerald-500/40 dark:border-emerald-900/60 shadow-sm transition-colors text-white">
