@@ -318,16 +318,16 @@ const KampusImeceApp = {
             const currentPhotoMode = this.photoViews[ev.id] || (isCompleted && ev.afterImageUrl ? 'after' : 'before');
             const displayImageUrl = (currentPhotoMode === 'after' && ev.afterImageUrl) ? ev.afterImageUrl : ev.imageUrl;
 
-            // Durum Rozeti (Frosted Glass Pill)
+            // Durum Rozeti (Frosted Glass Pill - Kompakt & Taşmayan)
             let statusBadge = '';
             if (isCompleted) {
-                statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-700/90 text-white backdrop-blur shadow-sm"><i data-lucide="sparkles" class="w-3 h-3"></i> Temizlendi</span>`;
+                statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-700/90 text-white backdrop-blur shadow-sm whitespace-nowrap"><i data-lucide="sparkles" class="w-2.5 h-2.5"></i> Temizlendi</span>`;
             } else if (isFull) {
-                statusBadge = `<span class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-900/85 text-white backdrop-blur shadow-sm">Dolu (${ev.requiredVolunteers}/${ev.requiredVolunteers})</span>`;
+                statusBadge = `<span class="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-slate-900/85 text-white backdrop-blur shadow-sm whitespace-nowrap">Dolu (${ev.requiredVolunteers})</span>`;
             } else if (remaining === 1) {
-                statusBadge = `<span class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-amber-600/90 text-white backdrop-blur shadow-sm">Son 1 Kişi</span>`;
+                statusBadge = `<span class="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-amber-600/90 text-white backdrop-blur shadow-sm whitespace-nowrap">Son 1 Kişi</span>`;
             } else {
-                statusBadge = `<span class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-emerald-600/90 text-white backdrop-blur shadow-sm">${remaining} Kişi Aranıyor</span>`;
+                statusBadge = `<span class="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-emerald-600/90 text-white backdrop-blur shadow-sm whitespace-nowrap">${remaining} Kişi</span>`;
             }
 
             // Katılımcı Avatarları
@@ -468,7 +468,7 @@ const KampusImeceApp = {
 
                         <!-- Sol Üst: Konum (Taşmayan, Temiz Etiket) -->
                         <div class="absolute top-2.5 left-2.5 z-10">
-                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-black/60 backdrop-blur-md text-white shadow-sm max-w-[170px]">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-black/60 backdrop-blur-md text-white shadow-sm max-w-[130px]">
                                 <i data-lucide="map-pin" class="w-3 h-3 text-emerald-400 shrink-0"></i>
                                 <span class="truncate">${this.escapeHtml(ev.locationName)}</span>
                             </span>
@@ -486,7 +486,7 @@ const KampusImeceApp = {
                         </div>
 
                         <!-- Sol Alt: Tarih -->
-                        <div class="absolute bottom-2.5 left-2.5 text-white text-[11px] font-medium flex items-center gap-1 drop-shadow-md">
+                        <div class="absolute bottom-2.5 left-2.5 text-white text-[10px] font-medium flex items-center gap-1 drop-shadow-md">
                             <i data-lucide="calendar" class="w-3 h-3 text-emerald-300 shrink-0"></i>
                             <span>${formattedDate}</span>
                         </div>
@@ -496,7 +496,7 @@ const KampusImeceApp = {
                     </div>
 
                     <!-- KART GÖVDESİ (HER BİLGİ NET, FERAH & KESİNTİSİZ) -->
-                    <div class="p-3.5 flex-1 flex flex-col justify-between">
+                    <div class="p-3 flex-1 flex flex-col justify-between">
                         <div>
                             <!-- Başlık (2 satıra kadar net okunaklı, boy hizalı) -->
                             <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 min-h-[2rem] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title="${this.escapeHtml(ev.title)}">

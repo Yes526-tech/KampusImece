@@ -4,8 +4,8 @@
 
 @Html.AntiForgeryToken()
 
-<!-- KAPSAYICI DASHBOARD (Masaüstünde Sayfayı Kaydırmadan Tam Sığan Yapı) -->
-<div class="flex flex-col h-full lg:h-[calc(100vh-4.25rem)] overflow-hidden">
+<!-- KAPSAYICI DASHBOARD (Masaüstünde Harita Tamamen Sabit, Sadece Sağ Taraf Aşağı Kayar) -->
+<div class="flex flex-col h-full min-h-0 overflow-hidden">
 
     <!-- ÜST KONTROL & MODERN SEGMENTED FİLTRE ÇUBUĞU -->
     <div class="mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shrink-0">
@@ -68,31 +68,31 @@
         </div>
     </div>
 
-    <!-- ANA GÖVDE: SPLIT VIEW (SOL: CANLI HARİTA, SAĞ: 3'LÜ YAN YANA KARTLAR) -->
+    <!-- ANA GÖVDE: SPLIT VIEW (SOL: SABİT CANLI HARİTA, SAĞ: AŞAĞI KAYAN 3x3 / 4x4 KARTLAR) -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 min-h-0 items-stretch overflow-hidden">
 
-        <!-- SOL: CANLI HARİTA (Masaüstünde Sayfaya Tam Sığar) -->
-        <div class="lg:col-span-5 xl:col-span-4 flex flex-col h-[340px] lg:h-full min-h-0">
+        <!-- SOL: SABİT CANLI HARİTA (Asla Kaymaz, Ekrana Tam Sabitlenir) -->
+        <div class="lg:col-span-4 xl:col-span-4 2xl:col-span-3 flex flex-col h-[340px] lg:h-full min-h-0 shrink-0">
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2.5 shadow-sm transition-colors flex flex-col h-full min-h-0">
                 <div class="flex items-center justify-between px-2.5 py-1 mb-1 text-xs shrink-0">
                     <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span class="font-semibold text-slate-800 dark:text-slate-100">Kampüs Haritası</span>
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="font-semibold text-slate-800 dark:text-slate-100">Kampüs Canlı Haritası</span>
                     </div>
-                    <div class="flex items-center gap-2.5 text-[11px] text-slate-500 dark:text-slate-400">
+                    <div class="flex items-center gap-2 text-[10px] text-slate-500 dark:text-slate-400">
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Açık</span>
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Az Kaldı</span>
                         <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-700"></span> Bitti</span>
                     </div>
                 </div>
 
-                <!-- Leaflet Container: flex-1 ile dikeyde tam sığar -->
+                <!-- Leaflet Container: Harita ekrana tam oturur -->
                 <div id="campusLiveMap" class="flex-1 w-full rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 min-h-0"></div>
 
                 <div class="px-2.5 pt-1.5 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 shrink-0">
                     <span>Alaaddin Keykubat Kampüsü</span>
                     <div class="flex items-center gap-2 text-[10px]">
-                        <span>Pin seçildiğinde karta odaklanır</span>
+                        <span>Sabit Harita</span>
                         <span>·</span>
                         <button type="button" onclick="openGlobalKvkkModal('kvkk')" class="hover:underline">KVKK</button>
                     </div>
@@ -100,8 +100,8 @@
             </div>
         </div>
 
-        <!-- SAĞ: ETKİNLİK KARTLARI (Masaüstünde Yan Yana 3 Kart) -->
-        <div class="lg:col-span-7 xl:col-span-8 flex flex-col h-full min-h-0 overflow-hidden">
+        <!-- SAĞ: ETKİNLİK KARTLARI (Sadece Bu Taraf Aşağı Doğru Kayar - 3x3 / 4x4 Dizilim) -->
+        <div class="lg:col-span-8 xl:col-span-8 2xl:col-span-9 flex flex-col h-full min-h-0 overflow-hidden">
             <div id="loadingIndicator" class="hidden py-8 text-center shrink-0">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 shadow-sm">
                     <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-emerald-600"></i>
@@ -109,8 +109,8 @@
                 </div>
             </div>
 
-            <!-- Kart Listesi (Masaüstünde 3'lü Yan Yana Grid, İçten Kaydırılabilir) -->
-            <div id="eventsListContainer" class="flex-1 overflow-y-auto pr-1.5 pb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3.5 scrollbar-thin">
+            <!-- Kart Listesi (SADECE BURASI AŞAĞI KAYAR: 3x3 veya 4x4 Izgara) -->
+            <div id="eventsListContainer" class="flex-1 min-h-0 overflow-y-auto pr-2 pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5 scrollbar-thin">
                 <!-- JavaScript (app.js) tarafından doldurulur -->
             </div>
         </div>
