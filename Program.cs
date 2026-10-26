@@ -9,7 +9,7 @@ AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Render / Bulut Sunucu Dinamik Port Yapılandırması (Port Scan Timeout Kesin Çözümü)
+// Render / Bulut Sunucu Dinamik Port Yapılandırması (IPv4 0.0.0.0 Garantili)
 var portStr = Environment.GetEnvironmentVariable("PORT");
 int listenPort = 10000;
 if (int.TryParse(portStr, out var parsedPort))
@@ -19,13 +19,8 @@ if (int.TryParse(portStr, out var parsedPort))
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.ListenAnyIP(listenPort);
-    if (listenPort != 8080)
-    {
-        serverOptions.ListenAnyIP(8080);
-    }
+    serverOptions.Listen(System.Net.IPAddress.Any, listenPort);
 });
-builder.WebHost.UseUrls($"http://0.0.0.0:{listenPort}", "http://0.0.0.0:8080");
 
 // 1. Controller & View Servisleri
 builder.Services.AddControllersWithViews();
@@ -86,9 +81,10 @@ if (!Directory.Exists(uploadsSpotsFolder))
     Directory.CreateDirectory(uploadsSpotsFolder);
 }
 
-// 8. Veritabanı Otomatik Migration & Seed (DbSeeder)
-using (var scope = app.Services.CreateScope())
+// 8. Veritabanı Otomatik Migration & Seed (DbSeeder - Render Port Taramasını Bekletmeyen Asenkron Başlatma)
+app.Lifetime.ApplicationStarted.Register(async () =>
 {
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
     try
     {
@@ -101,7 +97,7 @@ using (var scope = app.Services.CreateScope())
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "Veritabanı migration veya tohumlama (Seed) işlemi sırasında bir hata oluştu.");
     }
-}
+});
 
 // 9. HTTP İşlem Hattı (Middleware Pipeline)
 var forwardedHeadersOptions = new ForwardedHeadersOptions
@@ -118,7 +114,20 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // JS ve CSS dosyalarında tarayıcı önbelleklemesini önleyerek güncellemelerin anında görünmesini sağla
+        if (ctx.File.Name.EndsWith(".js", StringComparison.OrdinalIgnoreCase) || 
+            ctx.File.Name.EndsWith(".css", StringComparison.OrdinalIgnoreCase))
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
+            ctx.Context.Response.Headers.Append("Pragma", "no-cache");
+            ctx.Context.Response.Headers.Append("Expires", "0");
+        }
+    }
+});
 
 app.UseRouting();
 

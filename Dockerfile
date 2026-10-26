@@ -11,12 +11,11 @@ RUN dotnet publish "KampusImece.csproj" -c Release -o /app/publish /p:UseAppHost
 # Runtime (Çalışma) Aşaması
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-EXPOSE 8080
 EXPOSE 10000
 ENV ASPNETCORE_ENVIRONMENT=Production
 ENV PORT=10000
-ENV ASPNETCORE_HTTP_PORTS=10000;8080
-ENV ASPNETCORE_URLS=http://0.0.0.0:10000;http://0.0.0.0:8080
+ENV ASPNETCORE_HTTP_PORTS=10000
+ENV ASPNETCORE_URLS=http://0.0.0.0:10000
 
 COPY --from=build /app/publish .
 
