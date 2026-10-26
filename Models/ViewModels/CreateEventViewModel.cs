@@ -39,8 +39,11 @@ public class CreateEventViewModel
     public DateTime ScheduledAt { get; set; } = DateTime.Now.AddDays(1);
 
     [Required(ErrorMessage = "Kirlilik noktasının fotoğrafını yüklemek zorunludur.")]
-    [Display(Name = "Kirlilik Noktası Fotoğrafı")]
+    [Display(Name = "Kirlilik Noktası Fotoğrafı (Öncesi)")]
     public IFormFile Photo { get; set; } = null!;
+
+    [Display(Name = "Temizlenmiş Alan Fotoğrafı (Sonrası - İsteğe Bağlı)")]
+    public IFormFile? AfterPhoto { get; set; }
 
     /// <summary>
     /// Kültür (Culture) ayarlarından bağımsız olarak InvariantCulture ile parse edilmiş enlem

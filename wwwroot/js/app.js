@@ -32,6 +32,7 @@ const KampusImeceApp = {
         this.setupReportModal();
         this.setupVolunteerCounter();
         this.setupPhotoUpload();
+        this.setupCreateAfterPhotoUpload();
         this.loadEvents();
 
         // URL parametresi ile modal açma kontrolü (?openModal=true)
@@ -430,11 +431,27 @@ const KampusImeceApp = {
             // BUTON EYLEMLERİ (Net, Tekil, Taşmayan ve İç İçe Girmeyen Yapı)
             let actionBtnHtml = '';
             if (isCompleted) {
-                actionBtnHtml = `
-                    <div class="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1.5 border border-emerald-200 dark:border-emerald-800">
-                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
-                        <span>Temizlik Tamamlandı</span>
-                    </div>`;
+                if (ev.isCreator) {
+                    actionBtnHtml = `
+                        <div class="flex items-center gap-2">
+                            <div class="flex-1 py-2 px-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1 border border-emerald-200 dark:border-emerald-800 truncate">
+                                <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+                                <span class="truncate">Tamamlandı</span>
+                            </div>
+                            <button type="button" 
+                                    onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
+                                    class="py-2 px-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1 transition shadow-sm active:scale-95 whitespace-nowrap shrink-0">
+                                <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                                <span>${ev.afterImageUrl ? 'Sonrası Foto' : 'Sonrası Ekle'}</span>
+                            </button>
+                        </div>`;
+                } else {
+                    actionBtnHtml = `
+                        <div class="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1.5 border border-emerald-200 dark:border-emerald-800">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+                            <span>Temizlik Tamamlandı</span>
+                        </div>`;
+                }
             } else if (!isAuth) {
                 actionBtnHtml = `
                     <a href="/Auth/Login" onclick="event.stopPropagation();" class="w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
@@ -449,7 +466,7 @@ const KampusImeceApp = {
                                 onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
                                 class="w-full py-2 px-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
                             <i data-lucide="camera" class="w-3.5 h-3.5 shrink-0"></i>
-                            <span>Kanıtla</span>
+                            <span>Sonrası Ekle</span>
                         </button>
                         <button type="button" 
                                 onclick="event.stopPropagation(); KampusImeceApp.deleteEvent('${ev.id}')" 
@@ -1190,6 +1207,7 @@ const KampusImeceApp = {
             document.body.classList.remove('overflow-hidden');
             form.reset();
             this.resetPhotoPreview();
+            this.resetCreateAfterPhotoPreview();
         };
 
         form.addEventListener('submit', async (e) => {
@@ -1479,6 +1497,107 @@ const KampusImeceApp = {
         const previewImg = document.getElementById('photoPreviewImage');
         const previewContainer = document.getElementById('photoPreviewContainer');
         const dropPrompt = document.getElementById('photoDropPrompt');
+
+        if (fileInput) {
+            fileInput.value = '';
+            fileInput.classList.remove('pointer-events-none');
+        }
+        if (previewImg) {
+            if (previewImg._blobUrl) {
+                URL.revokeObjectURL(previewImg._blobUrl);
+                previewImg._blobUrl = null;
+            }
+            previewImg.src = '';
+        }
+        if (previewContainer) previewContainer.classList.add('hidden');
+        if (dropPrompt) dropPrompt.classList.remove('hidden');
+    },
+
+    // 12.B İLAN AÇARKEN İSTEĞE BAĞLI SONRASI FOTOĞRAFI YÜKLEME
+    setupCreateAfterPhotoUpload: function () {
+        const dropZone = document.getElementById('createAfterPhotoDropZone');
+        const fileInput = document.getElementById('createAfterPhotoFileInput');
+        const removeBtn = document.getElementById('btnRemoveCreateAfterPhoto');
+
+        if (!dropZone || !fileInput) return;
+
+        ['dragenter', 'dragover'].forEach(event => {
+            dropZone.addEventListener(event, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('border-emerald-500', 'bg-emerald-50/70');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(event => {
+            dropZone.addEventListener(event, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('border-emerald-500', 'bg-emerald-50/70');
+            });
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                fileInput.files = files;
+                this.handleCreateAfterFileSelected(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                this.handleCreateAfterFileSelected(e.target.files[0]);
+            }
+        });
+
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                this.resetCreateAfterPhotoPreview();
+            });
+        }
+    },
+
+    handleCreateAfterFileSelected: function (file) {
+        if (!file) return;
+        const previewImg = document.getElementById('createAfterPhotoPreviewImage');
+        const previewContainer = document.getElementById('createAfterPhotoPreviewContainer');
+        const dropPrompt = document.getElementById('createAfterPhotoDropPrompt');
+        const fileInput = document.getElementById('createAfterPhotoFileInput');
+
+        const isImage = file.type.startsWith('image/') || /\.(jpe?g|png|webp|heic|bmp)$/i.test(file.name || '');
+        if (!isImage) {
+            if (window.showToast) window.showToast('Lütfen geçerli bir resim dosyası seçiniz (.jpg, .png veya .webp).', 'error');
+            this.resetCreateAfterPhotoPreview();
+            return;
+        }
+
+        if (file.size > 15 * 1024 * 1024) {
+            if (window.showToast) window.showToast('Fotoğraf boyutu 15 MB sınırını aşıyor.', 'error');
+            this.resetCreateAfterPhotoPreview();
+            return;
+        }
+
+        try {
+            if (previewImg) {
+                if (previewImg._blobUrl) {
+                    URL.revokeObjectURL(previewImg._blobUrl);
+                }
+                const blobUrl = URL.createObjectURL(file);
+                previewImg._blobUrl = blobUrl;
+                previewImg.src = blobUrl;
+            }
+            if (previewContainer) previewContainer.classList.remove('hidden');
+            if (dropPrompt) dropPrompt.classList.add('hidden');
+            if (fileInput) fileInput.classList.add('pointer-events-none');
+        } catch (err) {
+            console.error('Sonrası önizleme hatası:', err);
+        }
+    },
+
+    resetCreateAfterPhotoPreview: function () {
+        const fileInput = document.getElementById('createAfterPhotoFileInput');
+        const previewImg = document.getElementById('createAfterPhotoPreviewImage');
+        const previewContainer = document.getElementById('createAfterPhotoPreviewContainer');
+        const dropPrompt = document.getElementById('createAfterPhotoDropPrompt');
 
         if (fileInput) {
             fileInput.value = '';

@@ -285,6 +285,16 @@
                         <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
                         <span>Bu temizlik görevi tamamlanmıştır. Teşekkürler!</span>
                     </div>
+
+                    @if (isCreator)
+                    {
+                        <button type="button" 
+                                onclick="openDetailsCompleteModal()" 
+                                class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-95">
+                            <i data-lucide="camera" class="w-4 h-4"></i>
+                            <span>@(string.IsNullOrEmpty(Model.AfterImageUrl) ? "Sonrası Fotoğrafı Ekle" : "Sonrası Fotoğrafını Güncelle")</span>
+                        </button>
+                    }
                 }
                 else if (!User.Identity?.IsAuthenticated == true)
                 {
@@ -372,7 +382,7 @@
         <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-2">
                 <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Temizlik Kanıtı Yükle</h3>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Temizlik Sonrası Fotoğrafı Ekle / Güncelle</h3>
             </div>
             <button type="button" onclick="closeDetailsCompleteModal()" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg">
                 <i data-lucide="x" class="w-4 h-4"></i>
@@ -385,10 +395,10 @@
 
             <div>
                 <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">
-                    Temizlik Sonrası Kanıt Fotoğrafı *
+                    Temizlenmiş Alan Fotoğrafı (Sonrası Fotoğrafı) *
                 </label>
                 <input type="file" id="detailsAfterPhoto" accept="image/jpeg,image/png,image/webp" required class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-slate-800 dark:file:text-emerald-400" />
-                <p class="text-[10px] text-slate-400 mt-1">Lütfen temizlenen alanın net ve aydınlık bir fotoğrafını yükleyiniz (JPG, PNG, WebP - En fazla 5MB).</p>
+                <p class="text-[10px] text-slate-400 mt-1">Öncesi/Sonrası karşılaştırması için temizlenen alanın net fotoğrafını yükleyiniz (JPG, PNG, WebP - En fazla 15MB).</p>
             </div>
 
             <div>
@@ -403,8 +413,8 @@
                     Vazgeç
                 </button>
                 <button type="submit" id="btnSubmitDetailsComplete" class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-sm transition active:scale-95 flex items-center gap-1.5">
-                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                    <span>Temizliği Onayla</span>
+                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                    <span>Sonrası Fotoğrafını Kaydet</span>
                 </button>
             </div>
         </form>

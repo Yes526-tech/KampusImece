@@ -140,33 +140,70 @@
 
             <div id="modalFormAlert" class="hidden p-2.5 rounded-xl text-xs font-medium border"></div>
 
-            <!-- FOTOĞRAF YÜKLEME -->
+            <!-- FOTOĞRAF YÜKLEME (ÖNCESİ VE SONRASI) -->
             <div>
-                <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">
-                    Kirlilik Alanı Fotoğrafı *
-                </label>
-                <div id="photoDropZone" 
-                     class="border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 rounded-xl p-3 text-center cursor-pointer transition bg-slate-50/50 dark:bg-slate-800/40 hover:bg-emerald-50/20 relative">
-                    <input type="file" 
-                           name="Photo" 
-                           id="photoFileInput" 
-                           accept="image/*,.jpg,.jpeg,.png,.webp" 
-                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0" 
-                           required />
-                    
-                    <div id="photoDropPrompt" class="py-2">
-                        <i data-lucide="upload-cloud" class="w-6 h-6 text-slate-400 dark:text-slate-500 mx-auto mb-1"></i>
-                        <p class="text-xs font-semibold text-slate-700 dark:text-slate-200">Fotoğraf seçin veya sürükleyin</p>
-                        <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">JPG, PNG veya WEBP (Maks 15 MB)</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <!-- 1. ÖNCESİ FOTOĞRAFI (ZORUNLU) -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                            <span>Kirlilik Alanı Fotoğrafı (Öncesi) *</span>
+                        </label>
+                        <div id="photoDropZone" 
+                             class="border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 rounded-xl p-3 text-center cursor-pointer transition bg-slate-50/50 dark:bg-slate-800/40 hover:bg-emerald-50/20 relative">
+                            <input type="file" 
+                                   name="Photo" 
+                                   id="photoFileInput" 
+                                   accept="image/*,.jpg,.jpeg,.png,.webp" 
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0" 
+                                   required />
+                            
+                            <div id="photoDropPrompt" class="py-2">
+                                <i data-lucide="upload-cloud" class="w-6 h-6 text-slate-400 dark:text-slate-500 mx-auto mb-1"></i>
+                                <p class="text-xs font-semibold text-slate-700 dark:text-slate-200">Öncesi Fotoğrafı</p>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">JPG, PNG (Maks 15 MB)</p>
+                            </div>
+
+                            <div id="photoPreviewContainer" class="hidden relative z-10">
+                                <img id="photoPreviewImage" class="w-full h-32 object-cover rounded-lg border border-slate-200 dark:border-slate-700" />
+                                <button type="button" 
+                                        id="btnRemovePhoto" 
+                                        class="absolute top-2 right-2 p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-white text-xs transition z-20 cursor-pointer">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <div id="photoPreviewContainer" class="hidden relative z-10">
-                        <img id="photoPreviewImage" class="w-full h-36 object-cover rounded-lg border border-slate-200 dark:border-slate-700" />
-                        <button type="button" 
-                                id="btnRemovePhoto" 
-                                class="absolute top-2 right-2 p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-white text-xs transition z-20 cursor-pointer">
-                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                        </button>
+                    <!-- 2. SONRASI FOTOĞRAFI (İSTEĞE BAĞLI - İLANI OLUŞTURAN EKLEYEBİLİR) -->
+                    <div>
+                        <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1 flex items-center gap-1">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span>Temizlenmiş Hali (Sonrası - İsteğe Bağlı)</span>
+                        </label>
+                        <div id="createAfterPhotoDropZone" 
+                             class="border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 rounded-xl p-3 text-center cursor-pointer transition bg-slate-50/50 dark:bg-slate-800/40 hover:bg-emerald-50/20 relative">
+                            <input type="file" 
+                                   name="AfterPhoto" 
+                                   id="createAfterPhotoFileInput" 
+                                   accept="image/*,.jpg,.jpeg,.png,.webp" 
+                                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-0" />
+                            
+                            <div id="createAfterPhotoDropPrompt" class="py-2">
+                                <i data-lucide="sparkles" class="w-6 h-6 text-emerald-500 mx-auto mb-1"></i>
+                                <p class="text-xs font-semibold text-slate-700 dark:text-slate-200">Sonrası Fotoğrafı</p>
+                                <p class="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">Temizlik yapıldıysa ekleyin</p>
+                            </div>
+
+                            <div id="createAfterPhotoPreviewContainer" class="hidden relative z-10">
+                                <img id="createAfterPhotoPreviewImage" class="w-full h-32 object-cover rounded-lg border border-slate-200 dark:border-slate-700" />
+                                <button type="button" 
+                                        id="btnRemoveCreateAfterPhoto" 
+                                        class="absolute top-2 right-2 p-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-900 text-white text-xs transition z-20 cursor-pointer">
+                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -175,7 +212,7 @@
                     <input type="checkbox" id="kvkkPhotoConsent" required 
                            class="mt-0.5 w-3.5 h-3.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500/20 cursor-pointer" />
                     <label for="kvkkPhotoConsent" class="text-[11px] text-slate-600 dark:text-slate-300 cursor-pointer select-none leading-tight">
-                        Fotoğrafta 3. şahıslara ait yüz, kimlik veya araç plakası yer almadığını beyan ederim. <span class="text-rose-500 font-bold">*</span>
+                        Yüklenen fotoğraflarda 3. şahıslara ait yüz, kimlik veya araç plakası yer almadığını beyan ederim. <span class="text-rose-500 font-bold">*</span>
                     </label>
                 </div>
             </div>
@@ -298,7 +335,7 @@
         <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 dark:border-slate-800">
             <div class="flex items-center gap-2">
                 <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
-                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Temizlik Kanıtı Yükle</h3>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Temizlik Sonrası Fotoğrafı Ekle / Güncelle</h3>
             </div>
             <button type="button" onclick="window.closeCompleteModal()" class="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition">
                 <i data-lucide="x" class="w-4 h-4"></i>
@@ -312,14 +349,14 @@
             <div id="completeModalAlert" class="hidden p-2.5 rounded-xl text-xs font-medium border"></div>
 
             <div class="p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-xl text-xs">
-                <span class="text-slate-400 dark:text-slate-500 block text-[10px]">Tamamlanan İlan:</span>
+                <span class="text-slate-400 dark:text-slate-500 block text-[10px]">İlan:</span>
                 <strong id="completeEventTitle" class="text-slate-800 dark:text-white font-semibold block mt-0.5">...</strong>
             </div>
 
             <!-- Sonrası Fotoğrafı -->
             <div>
                 <label class="block text-xs font-medium text-slate-700 dark:text-slate-200 mb-1">
-                    Temizlenmiş Alanın Fotoğrafı (Sonrası) *
+                    Temizlenmiş Alanın Fotoğrafı (Sonrası Fotoğrafı) *
                 </label>
                 <div id="afterPhotoDropZone" 
                      class="border border-dashed border-slate-300 dark:border-slate-700 hover:border-emerald-500 rounded-xl p-3 text-center cursor-pointer transition bg-slate-50/50 dark:bg-slate-800/40 hover:bg-emerald-50/20 relative">
@@ -369,8 +406,8 @@
             </div>
 
             <div class="p-2.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-100 dark:border-emerald-900 text-[11px] text-emerald-900 dark:text-emerald-200 flex items-center gap-2">
-                <i data-lucide="award" class="w-4 h-4 text-emerald-600 shrink-0"></i>
-                <span>Katılımcılara <strong>+30 Bonus</strong>, kanıtı yükleyene <strong>+10 Ekstra</strong> puan eklenir.</span>
+                <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600 shrink-0"></i>
+                <span>Yüklediğiniz fotoğraf Öncesi / Sonrası karşılaştırması olarak sergilenecektir.</span>
             </div>
 
             <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
@@ -382,8 +419,8 @@
                 <button type="submit" 
                         id="btnSubmitCompleteEvent" 
                         class="px-4 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition active:scale-95 flex items-center gap-1.5">
-                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
-                    <span>Temizliği Onayla</span>
+                    <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+                    <span>Sonrası Fotoğrafını Kaydet</span>
                 </button>
             </div>
         </form>

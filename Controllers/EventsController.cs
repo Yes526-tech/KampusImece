@@ -72,7 +72,6 @@ public class EventsController : Controller
         var hasJoined = currentUserId.HasValue && ev.Participations.Any(p => p.UserId == currentUserId.Value);
         var isCreator = currentUserId.HasValue && ev.CreatorId == currentUserId.Value;
         var canComplete = currentUserId.HasValue &&
-                          ev.Status != EventStatus.Completed &&
                           ev.Status != EventStatus.Cancelled &&
                           (isCreator || hasJoined);
 
@@ -221,7 +220,7 @@ public class EventsController : Controller
             return Unauthorized(new { success = false, message = "Oturum açmanız gerekmektedir." });
         }
 
-        // 1. Güvenli Fotoğraf Yükleme Servisi (Magic Bytes & 5MB Boyut Sınırı)
+        // 1. Güvenli Fotoğraf Yükleme Servisi (Öncesi Fotoğrafı)
         string imagePath;
         try
         {
@@ -231,6 +230,21 @@ public class EventsController : Controller
         {
             _logger.LogWarning(ex, "Fotoğraf yüklenirken güvenlik/doğrulama hatası.");
             return BadRequest(new { success = false, message = ex.Message });
+        }
+
+        // İsteğe Bağlı: Temizlik Sonrası Fotoğrafı (İlanı oluşturan doğrudan eklediyse)
+        string? afterImagePath = null;
+        if (model.AfterPhoto != null && model.AfterPhoto.Length > 0)
+        {
+            try
+            {
+                afterImagePath = await _fileStorageService.SaveSpotImageAsync(model.AfterPhoto);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Sonrası fotoğrafı yüklenirken hata.");
+                return BadRequest(new { success = false, message = "Sonrası fotoğrafı hatası: " + ex.Message });
+            }
         }
 
         // 2. Kültür (Culture) Bağımsız InvariantCulture Koordinat Çözümleme
@@ -249,7 +263,10 @@ public class EventsController : Controller
         try
         {
             var eventId = Guid.NewGuid();
-            var initialStatus = model.RequiredVolunteers <= 1 ? EventStatus.QuotaFull : EventStatus.Open;
+            var hasAfterPhoto = !string.IsNullOrEmpty(afterImagePath);
+            var initialStatus = hasAfterPhoto 
+                ? EventStatus.Completed 
+                : (model.RequiredVolunteers <= 1 ? EventStatus.QuotaFull : EventStatus.Open);
 
             var newEvent = new CleanupEvent
             {
@@ -262,6 +279,10 @@ public class EventsController : Controller
                 RequiredVolunteers = model.RequiredVolunteers,
                 ScheduledAt = model.ScheduledAt,
                 ImageUrl = imagePath,
+                AfterImageUrl = afterImagePath,
+                CompletedAt = hasAfterPhoto ? DateTime.UtcNow : null,
+                CompletedByUserId = hasAfterPhoto ? currentUserId.Value : null,
+                CompletionNote = hasAfterPhoto ? "İlan oluşturulurken temizlik öncesi ve sonrası fotoğrafları birlikte yüklendi." : null,
                 Status = initialStatus,
                 IsApproved = true,
                 CreatorId = currentUserId.Value,
@@ -299,15 +320,18 @@ public class EventsController : Controller
                 Latitude = newEvent.Latitude,
                 Longitude = newEvent.Longitude,
                 ImageUrl = newEvent.ImageUrl,
-                AfterImageUrl = null,
+                AfterImageUrl = newEvent.AfterImageUrl,
                 ScheduledAt = newEvent.ScheduledAt,
+                CompletedAt = newEvent.CompletedAt,
+                CompletedByUserId = newEvent.CompletedByUserId,
+                CompletionNote = newEvent.CompletionNote,
                 Status = newEvent.Status,
                 RequiredVolunteers = newEvent.RequiredVolunteers,
                 CurrentParticipantsCount = 1,
-                IsQuotaFull = (newEvent.RequiredVolunteers <= 1),
+                IsQuotaFull = (newEvent.Status == EventStatus.Completed || newEvent.RequiredVolunteers <= 1),
                 HasCurrentUserJoined = true,
                 IsCreator = true,
-                CanCurrentUserComplete = true,
+                CanCurrentUserComplete = !hasAfterPhoto,
                 CreatorName = creator?.FullName ?? "Bilinmiyor",
                 CreatedAt = newEvent.CreatedAt,
                 ParticipantsList = new List<ParticipantSummaryDto>
@@ -508,13 +532,7 @@ public class EventsController : Controller
             return NotFound(new { success = false, message = "Tamamlanmak istenen etkinlik bulunamadı." });
         }
 
-        // 1. Zaten tamamlanmış mı kontrolü
-        if (targetEvent.Status == EventStatus.Completed)
-        {
-            return BadRequest(new { success = false, message = "Bu etkinlik zaten tamamlanmış ve temizlik kanıtı yüklenmiştir." });
-        }
-
-        // 2. Yetki Kontrolü: İlanın kurucusu VEYA katılan gönüllülerinden biri olmalı (ya da Koordinatör)
+        // 1. Yetki Kontrolü: İlanın kurucusu VEYA katılan gönüllülerinden biri olmalı (ya da Koordinatör)
         bool isCreator = targetEvent.CreatorId == currentUserId.Value;
         bool isParticipant = targetEvent.Participations.Any(p => p.UserId == currentUserId.Value);
         bool isCoordinatorOrAdmin = User.IsInRole("Coordinator") || User.IsInRole("Admin");
@@ -524,17 +542,17 @@ public class EventsController : Controller
             return StatusCode(StatusCodes.Status403Forbidden, new
             {
                 success = false,
-                message = "Temizliği yalnızca bu ilanın kurucusu veya etkinliğe katılmış olan gönüllüler tamamlayabilir."
+                message = "Temizlik sonrası fotoğrafını yalnızca bu ilanın kurucusu veya etkinliğe katılmış olan gönüllüler ekleyebilir."
             });
         }
 
-        // 3. Dosya Doğrulaması
+        // 2. Dosya Doğrulaması
         if (afterPhoto == null || afterPhoto.Length == 0)
         {
-            return BadRequest(new { success = false, message = "Lütfen temizlik sonrasını gösteren kanıt fotoğrafını yükleyiniz." });
+            return BadRequest(new { success = false, message = "Lütfen temizlik sonrasını gösteren fotoğrafı yükleyiniz." });
         }
 
-        // 4. Güvenli Dosya Yükleme Servisi (Magic Bytes, Uzantı ve 5MB Kontrolü)
+        // 3. Güvenli Dosya Yükleme Servisi (Magic Bytes, Uzantı ve 5MB Kontrolü)
         string afterImagePath;
         try
         {
@@ -542,21 +560,32 @@ public class EventsController : Controller
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Kanıt fotoğrafı yüklenirken hata oluştu.");
+            _logger.LogWarning(ex, "Sonrası fotoğrafı yüklenirken hata oluştu.");
             return BadRequest(new { success = false, message = ex.Message });
         }
 
-        // 5. Veritabanı Güncellemesi
+        // 4. Veritabanı Güncellemesi
         await _concurrencyLock.WaitAsync();
         try
         {
+            // Varsa eski sonrası fotoğrafını temizle
+            if (!string.IsNullOrWhiteSpace(targetEvent.AfterImageUrl) && targetEvent.AfterImageUrl != afterImagePath)
+            {
+                await _fileStorageService.DeleteImageAsync(targetEvent.AfterImageUrl);
+            }
+
             targetEvent.Status = EventStatus.Completed;
             targetEvent.AfterImageUrl = afterImagePath;
             targetEvent.CompletedAt = DateTime.UtcNow;
             targetEvent.CompletedByUserId = currentUserId.Value;
-            targetEvent.CompletionNote = !string.IsNullOrWhiteSpace(completionNote) 
-                ? completionNote.Trim() 
-                : "Temizlik başarıyla tamamlandı, alan tertemiz hale getirildi.";
+            if (!string.IsNullOrWhiteSpace(completionNote))
+            {
+                targetEvent.CompletionNote = completionNote.Trim();
+            }
+            else if (string.IsNullOrWhiteSpace(targetEvent.CompletionNote))
+            {
+                targetEvent.CompletionNote = "Temizlik başarıyla tamamlandı, alan tertemiz hale getirildi.";
+            }
 
             await _context.SaveChangesAsync();
 
