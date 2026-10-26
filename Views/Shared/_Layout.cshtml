@@ -81,7 +81,7 @@
         }
     </style>
 </head>
-<body data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" class="flex flex-col font-sans antialiased text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 selection:bg-emerald-500 selection:text-white transition-colors duration-200 @(isMapPage ? "h-full h-[100dvh] overflow-hidden" : "min-h-screen")">
+<body data-authenticated="@(User.Identity?.IsAuthenticated == true ? "true" : "false")" data-user-id="@(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "")" data-user-fullname="@(User.Identity?.Name ?? "")" class="flex flex-col font-sans antialiased text-slate-800 dark:text-slate-100 bg-[#f8fafc] dark:bg-slate-950 selection:bg-emerald-500 selection:text-white transition-colors duration-200 @(isMapPage ? "h-full h-[100dvh] overflow-hidden" : "min-h-screen")">
 
     <!-- MODERN YEŞİL & BEYAZ NAVBAR -->
     <header class="sticky top-0 z-50 w-full shrink-0 h-16 bg-emerald-600 dark:bg-[#064e3b] border-b border-emerald-500/40 dark:border-emerald-900/60 shadow-sm transition-colors text-white">
@@ -113,6 +113,14 @@
                         <i data-lucide="trophy" class="w-3.5 h-3.5 @(activeController == "Leaderboard" ? "text-amber-300" : "text-emerald-200")"></i>
                         <span>Liderlik Sıralaması</span>
                     </a>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a asp-controller="Events" asp-action="History" 
+                           class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-medium transition @(activeController == "Events" && activeAction == "History" ? "bg-white/20 text-white font-semibold backdrop-blur-sm shadow-sm" : "text-white/80 hover:text-white hover:bg-white/10")">
+                            <i data-lucide="history" class="w-3.5 h-3.5 @(activeController == "Events" && activeAction == "History" ? "text-white" : "text-emerald-200")"></i>
+                            <span>İlan Geçmişim</span>
+                        </a>
+                    }
                     @if (User.IsInRole("Coordinator"))
                     {
                         <a asp-controller="Admin" asp-action="Index" 
@@ -344,7 +352,7 @@
                     </button>
                 </div>
 
-                <div class="py-3 space-y-1 text-xs">
+                <div class="py-3 space-y-1.5 text-xs">
                     @if (User.IsInRole("Coordinator"))
                     {
                         <a asp-controller="Admin" asp-action="Index" class="flex items-center gap-3 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/30 text-amber-800 dark:text-amber-300 font-semibold border border-amber-200 dark:border-amber-900">
@@ -353,6 +361,14 @@
                             <i data-lucide="chevron-right" class="w-4 h-4 text-amber-400"></i>
                         </a>
                     }
+                    <a asp-controller="Events" asp-action="History" class="flex items-center gap-3 p-3 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/30 text-emerald-900 dark:text-emerald-200 font-semibold border border-emerald-200/70 dark:border-emerald-800/60 hover:bg-emerald-100/60 transition">
+                        <i data-lucide="history" class="w-4 h-4 text-emerald-600 dark:text-emerald-400"></i>
+                        <div class="flex-1">
+                            <div class="text-xs font-bold text-slate-900 dark:text-white">İlan Geçmişim</div>
+                            <div class="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Açtığım ilanlar ve temizlenen yerler</div>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-emerald-600"></i>
+                    </a>
                     <a asp-controller="Events" asp-action="Index" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium transition">
                         <i data-lucide="map-pin" class="w-4 h-4 text-emerald-600"></i>
                         <span class="flex-1">Kampüs İlanları ve Harita</span>

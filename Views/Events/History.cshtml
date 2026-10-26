@@ -1,0 +1,716 @@
+@model KampusImece.Models.ViewModels.UserHistoryViewModel
+@using KampusImece.Models.Entities
+@{
+    ViewData["Title"] = "İlan Geçmişim";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- ÜST BAŞLIK VE PROFİL ÖZETİ -->
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-6 sm:p-8 shadow-sm transition-colors">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            
+            <!-- Sol: Kullanıcı Profili -->
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white font-bold text-xl sm:text-2xl flex items-center justify-center shadow-lg shadow-emerald-600/30 ring-4 ring-emerald-50 dark:ring-emerald-950/40">
+                    @Model.Initials
+                </div>
+                <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">@Model.UserFullName</h1>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold border @Model.BadgeColorClass shadow-sm">
+                            <i data-lucide="@Model.BadgeIcon" class="w-3.5 h-3.5"></i>
+                            <span>@Model.BadgeTitle</span>
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1.5">
+                        <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                        <span>@Model.UserEmail</span>
+                    </p>
+                    <div class="flex items-center gap-3 mt-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                        <span class="inline-flex items-center gap-1 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-200/70 dark:border-emerald-800">
+                            <i data-lucide="trophy" class="w-3.5 h-3.5 text-amber-500"></i>
+                            <strong>@Model.TotalScore Puan</strong> (Liderlik Katkısı)
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sağ: Hızlı Aksiyonlar -->
+            <div class="flex items-center gap-3 flex-wrap">
+                <a href="/?openModal=true" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition shadow-sm active:scale-95">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Yeni İlan Oluştur</span>
+                </a>
+                <a asp-controller="Events" asp-action="Index" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-xs hover:bg-slate-100 dark:hover:bg-slate-750 transition active:scale-95">
+                    <i data-lucide="map" class="w-4 h-4 text-emerald-600"></i>
+                    <span>Haritaya Dön</span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- 4 İSTATİSTİK KARTI -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+            
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+                    <span class="text-xs font-medium">Açtığım İlanlar</span>
+                    <i data-lucide="folder-plus" class="w-4 h-4 text-emerald-600"></i>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">@Model.CreatedEventsCount</div>
+                <span class="text-[10px] text-slate-400">Kampüse bildirilen kirlilik noktası</span>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+                    <span class="text-xs font-medium">Temizlenen Yerler</span>
+                    <i data-lucide="sparkles" class="w-4 h-4 text-emerald-600"></i>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">@Model.CompletedCleanupsCount</div>
+                <span class="text-[10px] text-slate-400">Doğaya geri kazandırılan alan</span>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+                    <span class="text-xs font-medium">Devam Eden İlanlar</span>
+                    <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">@Model.ActiveEventsCount</div>
+                <span class="text-[10px] text-slate-400">Gönüllü bekleyen noktalar</span>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 mb-1">
+                    <span class="text-xs font-medium">Katıldığım İlanlar</span>
+                    <i data-lucide="heart-handshake" class="w-4 h-4 text-teal-600"></i>
+                </div>
+                <div class="text-xl sm:text-2xl font-bold text-teal-600 dark:text-teal-400">@Model.TotalParticipationsCount</div>
+                <span class="text-[10px] text-slate-400">Destek verilen temizlik etkinliği</span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- SEKME SEÇİMİ (TABS) -->
+    <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-1">
+            <button type="button" 
+                    id="historyTabBtnCreated" 
+                    onclick="switchHistoryTab('created')" 
+                    class="px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-emerald-600 text-white shadow-sm">
+                <i data-lucide="folder-plus" class="w-4 h-4"></i>
+                <span>Açtığım İlanlar</span>
+                <span class="px-1.5 py-0.5 rounded-full bg-white/20 text-[10px]">@Model.MyCreatedEvents.Count</span>
+            </button>
+
+            <button type="button" 
+                    id="historyTabBtnParticipated" 
+                    onclick="switchHistoryTab('participated')" 
+                    class="px-4 py-2 rounded-xl text-xs font-medium transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
+                <i data-lucide="user-check" class="w-4 h-4"></i>
+                <span>Katıldığım Etkinlikler</span>
+                <span class="px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px]">@Model.MyParticipations.Count</span>
+            </button>
+
+            <button type="button" 
+                    id="historyTabBtnCompleted" 
+                    onclick="switchHistoryTab('completed')" 
+                    class="px-4 py-2 rounded-xl text-xs font-medium transition flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800">
+                <i data-lucide="sparkles" class="w-4 h-4"></i>
+                <span>Temizlenenler / Arşiv</span>
+                <span class="px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[10px]">
+                    @(Model.MyCreatedEvents.Count(e => e.Status == EventStatus.Completed) + Model.MyParticipations.Count(e => e.Status == EventStatus.Completed))
+                </span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 1. SEKME: AÇTIĞIM İLANLAR -->
+    <div id="historyTabContentCreated" class="space-y-4">
+        @if (!Model.MyCreatedEvents.Any())
+        {
+            <div class="py-16 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-8 shadow-sm">
+                <div class="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 mx-auto flex items-center justify-center mb-4">
+                    <i data-lucide="sprout" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Henüz Açılmış Bir İlanınız Yok</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 leading-relaxed">
+                    Kampüste fark ettiğiniz atık veya çevre kirliliği noktalarının fotoğrafını çekerek ilan oluşturabilir, diğer gönüllülerin katılımını sağlayabilirsiniz.
+                </p>
+                <a href="/?openModal=true" class="mt-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-sm transition active:scale-95">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>İlk Kirlilik İlanını Aç</span>
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var ev in Model.MyCreatedEvents)
+                {
+                    var isCompleted = ev.Status == EventStatus.Completed;
+                    var isFull = ev.Status == EventStatus.QuotaFull;
+                    var remaining = Math.Max(0, ev.RequiredVolunteers - ev.Participations.Count);
+                    var percent = Math.Min(100, Math.Round(((double)ev.Participations.Count / ev.RequiredVolunteers) * 100));
+
+                    <div id="history-card-@ev.Id" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden group">
+                        
+                        <!-- KARE GÖRSEL & ROZETLER -->
+                        <div class="relative w-full aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                            <img id="history-img-@ev.Id" src="@(isCompleted && !string.IsNullOrEmpty(ev.AfterImageUrl) ? ev.AfterImageUrl : ev.ImageUrl)" 
+                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" 
+                                 alt="@ev.Title" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+
+                            <!-- Sol Üst: Konum -->
+                            <div class="absolute top-2.5 left-2.5 z-10">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-black/60 backdrop-blur-md text-white shadow-sm max-w-[140px]">
+                                    <i data-lucide="map-pin" class="w-3 h-3 text-emerald-400 shrink-0"></i>
+                                    <span class="truncate">@ev.LocationName</span>
+                                </span>
+                            </div>
+
+                            <!-- Sağ Üst: Durum Rozeti -->
+                            <div class="absolute top-2.5 right-2.5 z-10">
+                                @if (isCompleted)
+                                {
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-700/90 text-white backdrop-blur shadow-sm">
+                                        <i data-lucide="sparkles" class="w-2.5 h-2.5"></i> Temizlendi
+                                    </span>
+                                }
+                                else if (isFull)
+                                {
+                                    <span class="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-slate-900/85 text-white backdrop-blur shadow-sm">
+                                        Dolu (@ev.RequiredVolunteers)
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-emerald-600/90 text-white backdrop-blur shadow-sm">
+                                        @remaining Kişi Aranıyor
+                                    </span>
+                                }
+                            </div>
+
+                            <!-- Sol Alt: Tarih -->
+                            <div class="absolute bottom-2.5 left-2.5 text-white text-[10px] font-medium flex items-center gap-1 drop-shadow-md">
+                                <i data-lucide="calendar" class="w-3 h-3 text-emerald-300 shrink-0"></i>
+                                <span>@ev.ScheduledAt.ToString("dd MMM yyyy, HH:mm", new System.Globalization.CultureInfo("tr-TR"))</span>
+                            </div>
+
+                            <!-- Sağ Alt: Öncesi/Sonrası Butonu (Eğer sonrası fotoğrafı varsa) -->
+                            @if (isCompleted && !string.IsNullOrEmpty(ev.AfterImageUrl))
+                            {
+                                <div class="absolute bottom-2.5 right-2.5 flex items-center bg-black/60 backdrop-blur-md p-0.5 rounded-lg text-[10px] font-medium z-10 border border-white/10 shadow-sm">
+                                    <button type="button" 
+                                            onclick="toggleHistoryPhoto('@ev.Id', '@ev.ImageUrl', 'before')" 
+                                            id="btn-hist-before-@ev.Id" 
+                                            class="px-2 py-0.5 rounded-md transition text-slate-300 hover:text-white">
+                                        Öncesi
+                                    </button>
+                                    <button type="button" 
+                                            onclick="toggleHistoryPhoto('@ev.Id', '@ev.AfterImageUrl', 'after')" 
+                                            id="btn-hist-after-@ev.Id" 
+                                            class="px-2 py-0.5 rounded-md transition bg-emerald-600 text-white font-semibold shadow">
+                                        Sonrası ✨
+                                    </button>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- KART GÖVDESİ -->
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
+                                    @ev.Title
+                                </h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mt-1 mb-3">
+                                    @(ev.Description ?? "Açıklama belirtilmedi.")
+                                </p>
+                            </div>
+
+                            <div>
+                                <!-- Gönüllü Katılım Çubuğu -->
+                                <div class="mb-3 p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                                    <div class="flex items-center justify-between text-xs mb-1">
+                                        <span class="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                                            <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
+                                            <span>Gönüllü Sayısı</span>
+                                        </span>
+                                        <span class="font-bold @(isFull ? "text-amber-500" : "text-slate-700 dark:text-slate-200")">
+                                            @ev.Participations.Count / @ev.RequiredVolunteers
+                                        </span>
+                                    </div>
+                                    <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                                        <div class="h-full rounded-full transition-all duration-300 @(isFull ? "bg-amber-500" : "bg-emerald-500")" style="width: @percent%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Tamamlanma Rapor Notu -->
+                                @if (isCompleted && !string.IsNullOrEmpty(ev.CompletionNote))
+                                {
+                                    <div class="mb-3 p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50">
+                                        <div class="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 mb-0.5">
+                                            <i data-lucide="check-check" class="w-3.5 h-3.5 text-emerald-600"></i>
+                                            <span>Temizlik Raporu</span>
+                                        </div>
+                                        <p class="text-[11px] text-emerald-700 dark:text-emerald-400 italic line-clamp-2">
+                                            "@ev.CompletionNote"
+                                        </p>
+                                    </div>
+                                }
+
+                                <!-- İlan Açılış Tarihi -->
+                                <div class="flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 mb-3 pt-1 border-t border-slate-100 dark:border-slate-800">
+                                    <span>İlan Açılış:</span>
+                                    <strong class="text-slate-600 dark:text-slate-300">@ev.CreatedAt.ToString("dd.MM.yyyy HH:mm")</strong>
+                                </div>
+
+                                <!-- BUTON AKSİYONLARI -->
+                                <div class="grid grid-cols-2 gap-2 pt-1">
+                                    <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" 
+                                       class="py-2 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-semibold text-xs flex items-center justify-center gap-1.5 transition text-center">
+                                        <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i>
+                                        <span>Detayı Gör</span>
+                                    </a>
+
+                                    @if (!isCompleted)
+                                    {
+                                        <button type="button" 
+                                                onclick="openHistoryCompleteModal('@ev.Id', '@ev.Title')" 
+                                                class="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95">
+                                            <i data-lucide="camera" class="w-3.5 h-3.5"></i>
+                                            <span>Sonrası Foto</span>
+                                        </button>
+                                    }
+                                    else
+                                    {
+                                        <button type="button" 
+                                                onclick="openHistoryCompleteModal('@ev.Id', '@ev.Title')" 
+                                                class="py-2 px-3 rounded-xl border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+                                            <i data-lucide="image" class="w-3.5 h-3.5"></i>
+                                            <span>Foto Güncelle</span>
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- 2. SEKME: KATILDIĞIM ETKİNLİKLER -->
+    <div id="historyTabContentParticipated" class="space-y-4 hidden">
+        @if (!Model.MyParticipations.Any())
+        {
+            <div class="py-16 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-8 shadow-sm">
+                <div class="w-16 h-16 rounded-2xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 mx-auto flex items-center justify-center mb-4">
+                    <i data-lucide="users" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Henüz Bir Etkinliğe Katılmadınız</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 leading-relaxed">
+                    Kampüs haritasındaki açık ilanlara katılarak çevre imecesine güç katabilir ve doğa puanı kazanabilirsiniz.
+                </p>
+                <a asp-controller="Events" asp-action="Index" class="mt-4 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs shadow-sm transition active:scale-95">
+                    <i data-lucide="map" class="w-4 h-4"></i>
+                    <span>İlanları Keşfet</span>
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var ev in Model.MyParticipations)
+                {
+                    var isCompleted = ev.Status == EventStatus.Completed;
+
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden group">
+                        
+                        <!-- KARE GÖRSEL -->
+                        <div class="relative w-full aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                            <img src="@(isCompleted && !string.IsNullOrEmpty(ev.AfterImageUrl) ? ev.AfterImageUrl : ev.ImageUrl)" 
+                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" 
+                                 alt="@ev.Title" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+
+                            <!-- Konum -->
+                            <div class="absolute top-2.5 left-2.5 z-10">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-black/60 backdrop-blur-md text-white shadow-sm max-w-[140px]">
+                                    <i data-lucide="map-pin" class="w-3 h-3 text-emerald-400 shrink-0"></i>
+                                    <span class="truncate">@ev.LocationName</span>
+                                </span>
+                            </div>
+
+                            <!-- Durum -->
+                            <div class="absolute top-2.5 right-2.5 z-10">
+                                @if (isCompleted)
+                                {
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-700/90 text-white backdrop-blur shadow-sm">
+                                        <i data-lucide="sparkles" class="w-2.5 h-2.5"></i> Temizlendi
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="px-2 py-0.5 rounded-lg text-[10px] font-semibold bg-emerald-600/90 text-white backdrop-blur shadow-sm">
+                                        Gönüllüsünüz (+30 Puan)
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- GÖVDE -->
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
+                                    @ev.Title
+                                </h4>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mt-1 mb-3">
+                                    @(ev.Description ?? "Açıklama belirtilmedi.")
+                                </p>
+                            </div>
+
+                            <div>
+                                <div class="flex items-center justify-between text-[11px] text-slate-500 mb-3 pt-2 border-t border-slate-100 dark:border-slate-800">
+                                    <span>İlan Sahibi:</span>
+                                    <strong class="text-slate-700 dark:text-slate-200">@ev.Creator.FullName</strong>
+                                </div>
+
+                                <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" 
+                                   class="w-full py-2 px-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold text-xs flex items-center justify-center gap-1.5 transition text-center shadow-sm">
+                                    <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i>
+                                    <span>İlan Detayına Git</span>
+                                </a>
+                            </div>
+                        </div>
+
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- 3. SEKME: TAMAMLANANLAR & ARŞİV -->
+    <div id="historyTabContentCompleted" class="space-y-4 hidden">
+        @{
+            var allCompleted = Model.MyCreatedEvents.Where(e => e.Status == EventStatus.Completed)
+                .Concat(Model.MyParticipations.Where(e => e.Status == EventStatus.Completed))
+                .DistinctBy(e => e.Id)
+                .OrderBy(e => e.CreatedAt)
+                .ToList();
+        }
+
+        @if (!allCompleted.Any())
+        {
+            <div class="py-16 text-center bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 p-8 shadow-sm">
+                <div class="w-16 h-16 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 mx-auto flex items-center justify-center mb-4">
+                    <i data-lucide="check-check" class="w-8 h-8"></i>
+                </div>
+                <h3 class="text-base font-bold text-slate-900 dark:text-white">Henüz Tamamlanmış Temizlik Yok</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-1 leading-relaxed">
+                    Açtığınız veya katıldığınız kirlilik noktaları temizlenip 'Sonrası Fotoğrafı' yüklendiğinde burada kalıcı arşiv olarak sergilenir.
+                </p>
+            </div>
+        }
+        else
+        {
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                @foreach (var ev in allCompleted)
+                {
+                    <div class="bg-white dark:bg-slate-900 rounded-2xl border border-emerald-200/70 dark:border-emerald-900/60 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden group ring-1 ring-emerald-500/10">
+                        <div class="relative w-full aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                            <img id="hist-comp-img-@ev.Id" src="@(string.IsNullOrEmpty(ev.AfterImageUrl) ? ev.ImageUrl : ev.AfterImageUrl)" 
+                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" 
+                                 alt="@ev.Title" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+
+                            <div class="absolute top-2.5 left-2.5 z-10">
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-medium bg-black/60 backdrop-blur-md text-white shadow-sm">
+                                    <i data-lucide="map-pin" class="w-3 h-3 text-emerald-400 shrink-0"></i>
+                                    <span class="truncate max-w-[130px]">@ev.LocationName</span>
+                                </span>
+                            </div>
+
+                            <div class="absolute top-2.5 right-2.5 z-10">
+                                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-700 text-white backdrop-blur shadow-sm">
+                                    <i data-lucide="sparkles" class="w-3 h-3 text-emerald-200"></i> Temizlendi
+                                </span>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(ev.AfterImageUrl))
+                            {
+                                <div class="absolute bottom-2.5 right-2.5 flex items-center bg-black/60 backdrop-blur-md p-0.5 rounded-lg text-[10px] font-medium z-10 border border-white/10 shadow-sm">
+                                    <button type="button" 
+                                            onclick="toggleArchivePhoto('@ev.Id', '@ev.ImageUrl', 'before')" 
+                                            id="btn-arch-before-@ev.Id" 
+                                            class="px-2 py-0.5 rounded-md transition text-slate-300 hover:text-white">
+                                        Öncesi
+                                    </button>
+                                    <button type="button" 
+                                            onclick="toggleArchivePhoto('@ev.Id', '@ev.AfterImageUrl', 'after')" 
+                                            id="btn-arch-after-@ev.Id" 
+                                            class="px-2 py-0.5 rounded-md transition bg-emerald-600 text-white font-semibold shadow">
+                                        Sonrası ✨
+                                    </button>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="p-4 flex-1 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">
+                                    @ev.Title
+                                </h4>
+                                @if (!string.IsNullOrEmpty(ev.CompletionNote))
+                                {
+                                    <p class="text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/30 p-2.5 rounded-xl border border-emerald-200/60 dark:border-emerald-900/40 italic line-clamp-2 mt-2 mb-2">
+                                        "@ev.CompletionNote"
+                                    </p>
+                                }
+                            </div>
+
+                            <div class="pt-3 border-t border-slate-100 dark:border-slate-800">
+                                <a asp-controller="Events" asp-action="Details" asp-route-id="@ev.Id" 
+                                   class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition text-center shadow-sm">
+                                    <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i>
+                                    <span>İlan Detayını ve Kanıtları Gör</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+
+</div>
+
+<!-- SONRASI FOTOĞRAFI YÜKLEME MODAL (GEÇMİŞ SAYFASINDAN HIZLICA KANIT EKLEME) -->
+<div id="historyCompleteModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden my-8" onclick="event.stopPropagation()">
+        
+        <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-slate-800">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 flex items-center justify-center">
+                    <i data-lucide="camera" class="w-4 h-4"></i>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-slate-900 dark:text-white">Sonrası Fotoğrafı Ekle / Güncelle</h3>
+                    <p class="text-[11px] text-slate-400 truncate max-w-xs" id="historyCompleteModalTitle">Etkinlik Başlığı</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeHistoryCompleteModal()" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <form id="historyCompleteForm" onsubmit="handleHistoryCompleteSubmit(event)" class="p-6 space-y-4">
+            @Html.AntiForgeryToken()
+            <input type="hidden" id="historyCompleteEventId" name="eventId" value="" />
+
+            <!-- Fotoğraf Yükleme Alanı -->
+            <div>
+                <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Temizlik Sonrası Kanıt Fotoğrafı <span class="text-rose-500">*</span>
+                </label>
+                <div id="historyPhotoDropzone" class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-4 text-center cursor-pointer hover:border-emerald-500 transition-colors">
+                    <input type="file" id="historyAfterPhotoInput" name="afterPhoto" accept="image/*" class="hidden" onchange="previewHistoryPhoto(this)" />
+                    <div id="historyPhotoPlaceholder" class="space-y-1">
+                        <i data-lucide="upload-cloud" class="w-8 h-8 mx-auto text-slate-400"></i>
+                        <p class="text-xs font-medium text-slate-700 dark:text-slate-200">Fotoğraf seçmek için tıklayın</p>
+                        <p class="text-[10px] text-slate-400">JPG, PNG, WEBP (Maks 10MB)</p>
+                    </div>
+                    <img id="historyPhotoPreview" src="#" alt="Önizleme" class="hidden w-full h-44 object-cover rounded-xl" />
+                </div>
+            </div>
+
+            <!-- Temizlik Rapor Notu -->
+            <div>
+                <label for="historyCompletionNote" class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Temizlik ve Atık Toplama Notu
+                </label>
+                <textarea id="historyCompletionNote" name="completionNote" rows="2" 
+                          placeholder="Örn: 4 torba plastik ve cam atık toplandı, geri dönüşüm konteynerine bırakıldı." 
+                          class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs focus:ring-2 focus:ring-emerald-500 outline-none transition"></textarea>
+            </div>
+
+            <div class="flex items-center justify-end gap-2.5 pt-2">
+                <button type="button" onclick="closeHistoryCompleteModal()" class="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                    Vazgeç
+                </button>
+                <button type="submit" id="historyCompleteSubmitBtn" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 transition shadow-sm active:scale-95">
+                    <i data-lucide="check-check" class="w-4 h-4"></i>
+                    <span>Kaydet ve Kanıtla</span>
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Sekme Değiştirme
+        function switchHistoryTab(tab) {
+            const btnCreated = document.getElementById('historyTabBtnCreated');
+            const btnPart = document.getElementById('historyTabBtnParticipated');
+            const btnComp = document.getElementById('historyTabBtnCompleted');
+
+            const contentCreated = document.getElementById('historyTabContentCreated');
+            const contentPart = document.getElementById('historyTabContentParticipated');
+            const contentComp = document.getElementById('historyTabContentCompleted');
+
+            const activeClass = 'bg-emerald-600 text-white shadow-sm font-bold';
+            const inactiveClass = 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 font-medium';
+
+            [btnCreated, btnPart, btnComp].forEach(btn => {
+                btn.className = 'px-4 py-2 rounded-xl text-xs transition flex items-center gap-2 ' + inactiveClass;
+            });
+
+            [contentCreated, contentPart, contentComp].forEach(c => c.classList.add('hidden'));
+
+            if (tab === 'created') {
+                btnCreated.className = 'px-4 py-2 rounded-xl text-xs transition flex items-center gap-2 ' + activeClass;
+                contentCreated.classList.remove('hidden');
+            } else if (tab === 'participated') {
+                btnPart.className = 'px-4 py-2 rounded-xl text-xs transition flex items-center gap-2 ' + activeClass;
+                contentPart.classList.remove('hidden');
+            } else {
+                btnComp.className = 'px-4 py-2 rounded-xl text-xs transition flex items-center gap-2 ' + activeClass;
+                contentComp.classList.remove('hidden');
+            }
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        // Öncesi / Sonrası Fotoğraf Değiştirici
+        function toggleHistoryPhoto(eventId, url, mode) {
+            const img = document.getElementById(`history-img-${eventId}`);
+            const btnB = document.getElementById(`btn-hist-before-${eventId}`);
+            const btnA = document.getElementById(`btn-hist-after-${eventId}`);
+            if (img) img.src = url;
+            if (btnB && btnA) {
+                if (mode === 'before') {
+                    btnB.classList.add('bg-emerald-600', 'text-white', 'shadow');
+                    btnB.classList.remove('text-slate-300');
+                    btnA.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+                    btnA.classList.add('text-slate-300');
+                } else {
+                    btnA.classList.add('bg-emerald-600', 'text-white', 'shadow');
+                    btnA.classList.remove('text-slate-300');
+                    btnB.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+                    btnB.classList.add('text-slate-300');
+                }
+            }
+        }
+
+        function toggleArchivePhoto(eventId, url, mode) {
+            const img = document.getElementById(`hist-comp-img-${eventId}`);
+            const btnB = document.getElementById(`btn-arch-before-${eventId}`);
+            const btnA = document.getElementById(`btn-arch-after-${eventId}`);
+            if (img) img.src = url;
+            if (btnB && btnA) {
+                if (mode === 'before') {
+                    btnB.classList.add('bg-emerald-600', 'text-white', 'shadow');
+                    btnB.classList.remove('text-slate-300');
+                    btnA.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+                    btnA.classList.add('text-slate-300');
+                } else {
+                    btnA.classList.add('bg-emerald-600', 'text-white', 'shadow');
+                    btnA.classList.remove('text-slate-300');
+                    btnB.classList.remove('bg-emerald-600', 'text-white', 'shadow');
+                    btnB.classList.add('text-slate-300');
+                }
+            }
+        }
+
+        // Modal Yönetimi
+        function openHistoryCompleteModal(eventId, title) {
+            document.getElementById('historyCompleteEventId').value = eventId;
+            document.getElementById('historyCompleteModalTitle').textContent = title || 'Kirlilik İlanı';
+            
+            const modal = document.getElementById('historyCompleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Dropzone tıklama tetikleme
+            const dropzone = document.getElementById('historyPhotoDropzone');
+            dropzone.onclick = () => document.getElementById('historyAfterPhotoInput').click();
+
+            if (window.lucide) lucide.createIcons();
+        }
+
+        function closeHistoryCompleteModal() {
+            const modal = document.getElementById('historyCompleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('historyCompleteForm').reset();
+            document.getElementById('historyPhotoPreview').classList.add('hidden');
+            document.getElementById('historyPhotoPlaceholder').classList.remove('hidden');
+        }
+
+        function previewHistoryPhoto(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('historyPhotoPreview');
+                    const placeholder = document.getElementById('historyPhotoPlaceholder');
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function handleHistoryCompleteSubmit(e) {
+            e.preventDefault();
+            const eventId = document.getElementById('historyCompleteEventId').value;
+            const fileInput = document.getElementById('historyAfterPhotoInput');
+            const note = document.getElementById('historyCompletionNote').value;
+            const submitBtn = document.getElementById('historyCompleteSubmitBtn');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                if (window.showToast) window.showToast('Lütfen temizlik sonrası fotoğrafını seçin.', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('afterPhoto', fileInput.files[0]);
+            formData.append('completionNote', note);
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+            if (token) formData.append('__RequestVerificationToken', token);
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span class="inline-flex items-center gap-1.5"><i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Yükleniyor...</span>`;
+            if (window.lucide) lucide.createIcons();
+
+            try {
+                const res = await fetch(`/api/events/${eventId}/complete`, {
+                    method: 'POST',
+                    headers: { 'RequestVerificationToken': token },
+                    body: formData
+                });
+
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    if (window.showToast) window.showToast(data.message, 'success');
+                    closeHistoryCompleteModal();
+                    setTimeout(() => window.location.reload(), 600);
+                } else {
+                    if (window.showToast) window.showToast(data.message || 'Hata oluştu.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span>Tekrar Dene</span>`;
+                }
+            } catch (err) {
+                if (window.showToast) window.showToast('Sunucu ile iletişim hatası.', 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>Tekrar Dene</span>`;
+            }
+        }
+    </script>
+}

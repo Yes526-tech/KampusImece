@@ -84,6 +84,77 @@ public class EventsController : Controller
     }
 
     /// <summary>
+    /// Kullanıcının oluşturduğu kirlilik ilanlarının ve temizlik geçmişinin yer aldığı geçmiş sayfası
+    /// </summary>
+    [HttpGet]
+    [Authorize]
+    [Route("Events/History")]
+    [Route("Events/MyHistory")]
+    public async Task<IActionResult> History()
+    {
+        var currentUserId = GetCurrentUserId();
+        if (!currentUserId.HasValue)
+        {
+            return RedirectToAction("Login", "Auth", new { returnUrl = "/Events/History" });
+        }
+
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == currentUserId.Value);
+        if (user == null)
+        {
+            return RedirectToAction("Login", "Auth");
+        }
+
+        // Kullanıcının bizzat açtığı tüm ilanlar (aktifler üstte, tamamlananlar altta; tarihe göre sıralı)
+        var myCreatedEvents = await _context.CleanupEvents
+            .Include(e => e.Creator)
+            .Include(e => e.Participations)
+                .ThenInclude(p => p.User)
+            .Where(e => e.CreatorId == currentUserId.Value && e.Status != EventStatus.Cancelled)
+            .OrderBy(e => e.Status == EventStatus.Completed ? 1 : 0)
+            .ThenBy(e => e.CreatedAt)
+            .AsNoTracking()
+            .ToListAsync();
+
+        // Kullanıcının katıldığı diğer temizlikler
+        var myParticipations = await _context.CleanupEvents
+            .Include(e => e.Creator)
+            .Include(e => e.Participations)
+                .ThenInclude(p => p.User)
+            .Where(e => e.CreatorId != currentUserId.Value && 
+                        e.Participations.Any(p => p.UserId == currentUserId.Value) && 
+                        e.Status != EventStatus.Cancelled)
+            .OrderBy(e => e.Status == EventStatus.Completed ? 1 : 0)
+            .ThenBy(e => e.CreatedAt)
+            .AsNoTracking()
+            .ToListAsync();
+
+        var createdCount = myCreatedEvents.Count;
+        var completedCount = myCreatedEvents.Count(e => e.Status == EventStatus.Completed) +
+                             myParticipations.Count(e => e.Status == EventStatus.Completed);
+        var activeCount = myCreatedEvents.Count(e => e.Status == EventStatus.Open || e.Status == EventStatus.QuotaFull);
+        var participationsCount = myParticipations.Count;
+
+        var totalScore = (createdCount * 25) + (participationsCount * 30) + (completedCount * 50);
+
+        var model = new UserHistoryViewModel
+        {
+            UserFullName = user.FullName,
+            UserEmail = user.Email,
+            Initials = GetInitials(user.FullName),
+            CreatedEventsCount = createdCount,
+            CompletedCleanupsCount = completedCount,
+            ActiveEventsCount = activeCount,
+            TotalParticipationsCount = participationsCount,
+            TotalScore = totalScore,
+            BadgeTitle = LeaderboardEntryDto.DetermineBadge(totalScore),
+            MyCreatedEvents = myCreatedEvents,
+            MyParticipations = myParticipations
+        };
+
+        return View(model);
+    }
+
+    /// <summary>
     /// Harita ve kart listesi için tüm aktif ve tamamlanmış etkinlikleri JSON olarak döner (filtreleme destekli)
     /// </summary>
     [HttpGet]
@@ -98,6 +169,7 @@ public class EventsController : Controller
             .Include(e => e.Creator)
             .Include(e => e.Participations)
                 .ThenInclude(p => p.User)
+            .Where(e => e.Status != EventStatus.Cancelled)
             .AsNoTracking()
             .AsQueryable();
 
@@ -139,9 +211,10 @@ public class EventsController : Controller
             }
         }
 
+        // Temizlenen yerler her zaman en altta sabit, aktif ilanlar ise tarihe göre (en son açılan en sonda)
         var events = await query
-            .OrderBy(e => e.Status == EventStatus.Open ? 0 : (e.Status == EventStatus.QuotaFull ? 1 : (e.Status == EventStatus.Completed ? 2 : 3)))
-            .ThenByDescending(e => e.CreatedAt)
+            .OrderBy(e => e.Status == EventStatus.Completed ? 1 : 0)
+            .ThenBy(e => e.CreatedAt)
             .ToListAsync();
 
         var dtoList = events.Select(e =>
