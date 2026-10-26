@@ -463,14 +463,14 @@ const KampusImeceApp = {
             statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500 text-white shadow-sm whitespace-nowrap">${remaining} Kişi</span>`;
         }
 
-        // BUTON EYLEMLERİ (Açık sekmesindeki buton tasarımıyla birebir aynı CSS design: tam genişlik, tekil, yeşil/net)
+        // BUTON EYLEMLERİ (Açık sekmesindeki buton tasarımıyla birebir aynı CSS design: tam genişlik, ferah, yeşil/net)
         let actionBtnHtml = '';
         if (!isAuth) {
-            // Giriş yapmamış kullanıcı için Açık sekmesindeki standart yeşil "Giriş Yap / Katıl" butonu
+            // Giriş yapmamış kullanıcı için standart yeşil "Giriş Yap / Katıl" butonu
             actionBtnHtml = `
                 <a href="/Auth/Login" 
                    onclick="event.stopPropagation();" 
-                   class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
+                   class="w-full py-3 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
                     <i data-lucide="log-in" class="w-4 h-4 shrink-0"></i>
                     <span class="truncate">Giriş Yap / Katıl</span>
                 </a>`;
@@ -478,7 +478,7 @@ const KampusImeceApp = {
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
-                        class="w-full py-2.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap truncate">
+                        class="w-full py-3 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap truncate">
                     <i data-lucide="user-minus" class="w-4 h-4 shrink-0"></i>
                     <span class="truncate">Ayrıl</span>
                 </button>`;
@@ -486,7 +486,7 @@ const KampusImeceApp = {
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation(); window.location.href='/Events/Details/${ev.id}'" 
-                        class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
+                        class="w-full py-3 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
                     <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0"></i>
                     <span class="truncate">Temizlendi — Detaylar</span>
                 </button>`;
@@ -494,7 +494,7 @@ const KampusImeceApp = {
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
-                        class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
+                        class="w-full py-3 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
                     <i data-lucide="camera" class="w-4 h-4 shrink-0"></i>
                     <span class="truncate">Sonrası Fotoğrafı Ekle</span>
                 </button>`;
@@ -502,16 +502,16 @@ const KampusImeceApp = {
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation(); window.location.href='/Events/Details/${ev.id}'" 
-                        class="w-full py-2.5 px-3 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
+                        class="w-full py-3 px-3 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
                     <i data-lucide="lock" class="w-4 h-4 shrink-0"></i>
-                    <span class="truncate">Dolu — İlanı İncele</span>
+                    <span class="truncate">Dolu — İncele</span>
                 </button>`;
         } else {
             // Açık sekmesindeki standart "Gönüllü Ol (+1)" butonu
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
-                        class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors shadow-sm active:scale-95 whitespace-nowrap truncate">
+                        class="w-full py-3 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors shadow-sm active:scale-95 whitespace-nowrap truncate">
                     <i data-lucide="hand" class="w-4 h-4 shrink-0"></i>
                     <span class="truncate">Gönüllü Ol (+1)</span>
                 </button>`;
@@ -524,9 +524,9 @@ const KampusImeceApp = {
         return `
             <div id="event-card-${ev.id}" 
                  onclick="window.location.href='/Events/Details/${ev.id}'" 
-                 class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full overflow-hidden group cursor-pointer active:scale-[0.99] w-full mx-auto">
+                 class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full min-h-[460px] overflow-hidden group cursor-pointer active:scale-[0.99] w-full mx-auto">
                 
-                <!-- 2. GÖRSEL ALANI & ÜZERİNDEKİ ROZETLER (Açık sekmesiyle birebir aynı aspect-video overlay) -->
+                <!-- 2. GÖRSEL ALANI & ÜZERİNDEKİ ROZETLER (16:9 Aspect Video) -->
                 <div class="aspect-video w-full rounded-t-2xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800">
                     <img id="event-img-${ev.id}" 
                          src="${displayImageUrl}" 
@@ -560,36 +560,47 @@ const KampusImeceApp = {
                     </div>
                 </div>
 
-                <!-- 3. KART GÖVDESİ (BODY) & DETAYLAR -->
-                <div class="p-4 flex flex-col flex-1">
+                <!-- 3. KART GÖVDESİ (BODY) & GENİŞLETİLMİŞ DETAYLAR -->
+                <div class="p-5 flex flex-col flex-1">
                     <!-- Başlık ve Detay Linki -->
-                    <div class="flex items-start justify-between gap-2 mb-2.5 min-h-[2.75rem]">
-                        <h4 class="font-semibold text-slate-800 dark:text-white line-clamp-2 text-xs sm:text-sm leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex-1" title="${this.escapeHtml(ev.title)}">
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <h4 class="font-bold text-slate-900 dark:text-white line-clamp-2 text-sm leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex-1" title="${this.escapeHtml(ev.title)}">
                             ${this.escapeHtml(ev.title)}
                         </h4>
-                        <span class="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 text-xs font-semibold shrink-0 flex items-center gap-0.5 pt-0.5 whitespace-nowrap">
+                        <span class="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 text-xs font-bold shrink-0 flex items-center gap-0.5 pt-0.5 whitespace-nowrap">
                             <span>Detay</span> <i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0"></i>
                         </span>
                     </div>
 
-                    <!-- Katılım / İlerleme Çubuğu (Açık sekmesiyle birebir aynı yeşil ilerleme çubuğu) -->
-                    <div class="space-y-1.5 mb-2">
+                    <!-- İlan Detay Açıklaması (Genişletilmiş Açıklama) -->
+                    <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 mb-3 leading-relaxed">
+                        ${this.escapeHtml(ev.description || 'Detaylar ve katılım için inceleyin.')}
+                    </p>
+
+                    <!-- Katılımcılar & İlan Sahibi Bilgisi -->
+                    <div class="flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 mb-3 pt-2.5 border-t border-slate-100 dark:border-slate-800">
+                        <span>Açan: <strong class="text-slate-700 dark:text-slate-200 font-semibold">${this.escapeHtml((ev.creatorName || 'Öğrenci').split(' ')[0])}</strong></span>
+                        <span class="text-emerald-600 dark:text-emerald-400 font-semibold">${ev.currentParticipantsCount} Gönüllü</span>
+                    </div>
+
+                    <!-- Katılım / İlerleme Çubuğu -->
+                    <div class="space-y-1.5 mb-4">
                         <div class="flex items-center justify-between text-xs gap-2">
-                            <span class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium truncate">
+                            <span class="flex items-center gap-1.5 text-slate-600 dark:text-slate-300 font-medium truncate">
                                 <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
                                 <span class="truncate">Gönüllü Katılımı</span>
                             </span>
-                            <span class="font-bold text-slate-800 dark:text-slate-200 shrink-0 whitespace-nowrap">
+                            <span class="font-bold text-slate-800 dark:text-slate-100 shrink-0 whitespace-nowrap">
                                 ${ev.currentParticipantsCount} / ${ev.requiredVolunteers}
                             </span>
                         </div>
                         <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                            <div class="h-full rounded-full transition-all bg-emerald-500" style="width: ${percent}%"></div>
+                            <div class="h-full rounded-full transition-all bg-emerald-500 shadow-sm" style="width: ${percent}%"></div>
                         </div>
                     </div>
 
-                    <!-- 4. ALT BUTON (ACTION BUTTON - mt-auto pt-4 ile TABANDA KİLİTLİ) -->
-                    <div class="mt-auto pt-4">
+                    <!-- 4. ALT EYLEM / KATIL TUŞLARI (AŞAĞI TABANA YERLEŞİK FERAH ALAN) -->
+                    <div class="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800/80">
                         ${actionBtnHtml}
                     </div>
                 </div>
