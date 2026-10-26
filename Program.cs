@@ -1,6 +1,7 @@
 using KampusImece.Data;
 using KampusImece.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 
 // PostgreSQL Tarih/Saat Uyumluluğu
@@ -11,10 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. Controller & View Servisleri
 builder.Services.AddControllersWithViews();
 
-// 2. EF Core PostgreSQL Veritabanı Servisi
+// 2. EF Core PostgreSQL Veritabanı Servisi (Cloud URI & Standart Bağlantı Desteği)
+var rawConnectionString = Environment.GetEnvironmentVariable("DATABASE_URL") 
+    ?? builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? "Host=localhost;Port=5432;Database=kampusimece_db;Username=yes;Password=";
+
+var connectionString = ConvertPostgresUriToConnectionString(rawConnectionString);
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection") 
-                      ?? "Host=localhost;Port=5432;Database=kampusimece_db;Username=yes;Password="));
+    options.UseNpgsql(connectionString));
 
 // 3. Güvenlik & İş Katmanı Bağımlılık Kayıtları (Dependency Injection)
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
@@ -80,13 +86,17 @@ using (var scope = app.Services.CreateScope())
 }
 
 // 9. HTTP İşlem Hattı (Middleware Pipeline)
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Events/Error");
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -101,3 +111,31 @@ app.MapControllerRoute(
     pattern: "{controller=Events}/{action=Index}/{id?}");
 
 app.Run();
+
+// Bulut Sağlayıcılar (Render, Railway, Heroku, Supabase) için PostgreSQL URI Dönüştürücü
+static string ConvertPostgresUriToConnectionString(string rawConn)
+{
+    if (string.IsNullOrWhiteSpace(rawConn)) return rawConn;
+
+    if (rawConn.StartsWith("postgres://", StringComparison.OrdinalIgnoreCase) || 
+        rawConn.StartsWith("postgresql://", StringComparison.OrdinalIgnoreCase))
+    {
+        try
+        {
+            var uri = new Uri(rawConn);
+            var userInfo = uri.UserInfo.Split(':');
+            var username = userInfo.Length > 0 ? Uri.UnescapeDataString(userInfo[0]) : "";
+            var password = userInfo.Length > 1 ? Uri.UnescapeDataString(userInfo[1]) : "";
+            var database = uri.AbsolutePath.TrimStart('/');
+            var port = uri.Port > 0 ? uri.Port : 5432;
+
+            return $"Host={uri.Host};Port={port};Database={database};Username={username};Password={password};Ssl Mode=Prefer;Trust Server Certificate=true";
+        }
+        catch
+        {
+            return rawConn;
+        }
+    }
+
+    return rawConn;
+}
