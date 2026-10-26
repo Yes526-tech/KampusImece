@@ -4,8 +4,8 @@
 
 @Html.AntiForgeryToken()
 
-<!-- KAPSAYICI DASHBOARD (Masaüstünde Harita Tamamen Sabit, Sadece Sağ Taraf Aşağı Kayar) -->
-<div class="flex flex-col h-full min-h-0 overflow-hidden">
+<!-- KAPSAYICI DASHBOARD (Masaüstünde Harita Tamamen Sabit, Mobilde Akıcı Uygulama Deneyimi) -->
+<div class="flex flex-col h-full min-h-0 overflow-visible lg:overflow-hidden">
 
     <!-- ÜST KONTROL & MODERN SEGMENTED FİLTRE ÇUBUĞU -->
     <div class="mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shrink-0">
@@ -69,10 +69,10 @@
     </div>
 
     <!-- ANA GÖVDE: SPLIT VIEW (SOL: SABİT CANLI HARİTA, SAĞ: AŞAĞI KAYAN 3x3 / 4x4 KARTLAR) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 min-h-0 items-stretch overflow-hidden">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 min-h-0 items-stretch overflow-visible lg:overflow-hidden">
 
-        <!-- SOL: SABİT CANLI HARİTA (Asla Kaymaz, Ekrana Tam Sabitlenir) -->
-        <div class="lg:col-span-4 xl:col-span-4 2xl:col-span-3 flex flex-col h-[340px] lg:h-full min-h-0 shrink-0">
+        <!-- SOL: SABİT CANLI HARİTA (Masaüstünde Asla Kaymaz, Mobilde Kompakt & Etkileşimli) -->
+        <div class="lg:col-span-4 xl:col-span-4 2xl:col-span-3 flex flex-col h-[280px] sm:h-[340px] lg:h-full min-h-0 shrink-0">
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2.5 shadow-sm transition-colors flex flex-col h-full min-h-0">
                 <div class="flex items-center justify-between px-2.5 py-1 mb-1 text-xs shrink-0">
                     <div class="flex items-center gap-2">
@@ -100,8 +100,8 @@
             </div>
         </div>
 
-        <!-- SAĞ: ETKİNLİK KARTLARI (Sadece Bu Taraf Aşağı Doğru Kayar - 3x3 / 4x4 Dizilim) -->
-        <div class="lg:col-span-8 xl:col-span-8 2xl:col-span-9 flex flex-col h-full min-h-0 overflow-hidden">
+        <!-- SAĞ: ETKİNLİK KARTLARI (Masaüstünde Sadece Bu Taraf Kayar - 3x3 / 4x4 Dizilim) -->
+        <div class="lg:col-span-8 xl:col-span-8 2xl:col-span-9 flex flex-col h-full min-h-0 overflow-visible lg:overflow-hidden">
             <div id="loadingIndicator" class="hidden py-8 text-center shrink-0">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 shadow-sm">
                     <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-emerald-600"></i>
@@ -109,8 +109,8 @@
                 </div>
             </div>
 
-            <!-- Kart Listesi (SADECE BURASI AŞAĞI KAYAR: 3x3 veya 4x4 Izgara) -->
-            <div id="eventsListContainer" class="flex-1 min-h-0 overflow-y-auto pr-2 pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5 scrollbar-thin">
+            <!-- Kart Listesi (Mobilde Akıcı Liste, Masaüstünde İçten Kaydırılabilir 3'lü/4'lü Izgara) -->
+            <div id="eventsListContainer" class="flex-1 min-h-0 overflow-y-visible lg:overflow-y-auto pr-0 lg:pr-2 pb-28 lg:pb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-3.5 scrollbar-thin">
                 <!-- JavaScript (app.js) tarafından doldurulur -->
             </div>
         </div>
