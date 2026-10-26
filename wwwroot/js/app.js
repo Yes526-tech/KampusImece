@@ -443,7 +443,7 @@ const KampusImeceApp = {
     // KART HTML OLUŞTURUCU (Yerinde Güncelleme ve Yeniden Çizim İçin Ortak Fonksiyon)
     getCardHtml: function (ev, isAuth) {
         const isCompleted = ev.status === 2;
-        const isFull = ev.isQuotaFull;
+        const isFull = ev.isQuotaFull || ev.status === 1 || ev.currentParticipantsCount >= ev.requiredVolunteers;
         const remaining = Math.max(0, ev.requiredVolunteers - ev.currentParticipantsCount);
         const percent = Math.min(100, Math.round((ev.currentParticipantsCount / ev.requiredVolunteers) * 100));
 
@@ -463,10 +463,39 @@ const KampusImeceApp = {
             statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500 text-white shadow-sm whitespace-nowrap">${remaining} Kişi</span>`;
         }
 
-        // BUTON EYLEMLERİ (Açık sekmesindeki buton tasarımıyla birebir aynı CSS design: tam genişlik, ferah, yeşil/net)
+        // BUTON EYLEMLERİ: Temizlenen ve Dolan İlanlar İçin KESİN KİLİTLİ BUTON (Katılım Engelli)
         let actionBtnHtml = '';
-        if (!isAuth) {
-            // Giriş yapmamış kullanıcı için standart yeşil "Giriş Yap / Katıl" butonu
+        if (isCompleted) {
+            // 1. TEMİZLENEN İLANLAR: Katılıma tamamen kapalı ve kilitli buton
+            actionBtnHtml = `
+                <button type="button" 
+                        disabled 
+                        onclick="event.stopPropagation();" 
+                        class="w-full py-3 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700/80 cursor-not-allowed whitespace-nowrap select-none shadow-none">
+                    <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+                    <span class="truncate">Temizlendi (Katılıma Kapalı)</span>
+                </button>`;
+        } else if (ev.hasCurrentUserJoined) {
+            // 2. KULLANICI ZATEN KATILMIŞSA: İsterse ayrılabilmeli
+            actionBtnHtml = `
+                <button type="button" 
+                        onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
+                        class="w-full py-3 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap truncate">
+                    <i data-lucide="user-minus" class="w-4 h-4 shrink-0"></i>
+                    <span class="truncate">Katılımdan Ayrıl</span>
+                </button>`;
+        } else if (isFull) {
+            // 3. KONTENJANI DOLAN İLANLAR: Kesin kilitli buton (Katılım Kapalı)
+            actionBtnHtml = `
+                <button type="button" 
+                        disabled 
+                        onclick="event.stopPropagation();" 
+                        class="w-full py-3 px-3 rounded-xl bg-slate-100 dark:bg-slate-800/80 text-slate-400 dark:text-slate-500 font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700/80 cursor-not-allowed whitespace-nowrap select-none shadow-none">
+                    <i data-lucide="lock" class="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0"></i>
+                    <span class="truncate">Kontenjan Doldu (Kilitli)</span>
+                </button>`;
+        } else if (!isAuth) {
+            // 4. AÇIK İLANLARDA GİRİŞ YAPMAMIŞ KULLANICI: Giriş Yap / Katıl Butonu
             actionBtnHtml = `
                 <a href="/Auth/Login" 
                    onclick="event.stopPropagation();" 
@@ -474,23 +503,8 @@ const KampusImeceApp = {
                     <i data-lucide="log-in" class="w-4 h-4 shrink-0"></i>
                     <span class="truncate">Giriş Yap / Katıl</span>
                 </a>`;
-        } else if (ev.hasCurrentUserJoined) {
-            actionBtnHtml = `
-                <button type="button" 
-                        onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
-                        class="w-full py-3 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap truncate">
-                    <i data-lucide="user-minus" class="w-4 h-4 shrink-0"></i>
-                    <span class="truncate">Ayrıl</span>
-                </button>`;
-        } else if (isCompleted) {
-            actionBtnHtml = `
-                <button type="button" 
-                        onclick="event.stopPropagation(); window.location.href='/Events/Details/${ev.id}'" 
-                        class="w-full py-3 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
-                    <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0"></i>
-                    <span class="truncate">Temizlendi — Detaylar</span>
-                </button>`;
         } else if (ev.isCreator) {
+            // 5. İLAN SAHİBİ (Açık İlan): Sonrası Fotoğrafı Ekle
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
@@ -498,16 +512,8 @@ const KampusImeceApp = {
                     <i data-lucide="camera" class="w-4 h-4 shrink-0"></i>
                     <span class="truncate">Sonrası Fotoğrafı Ekle</span>
                 </button>`;
-        } else if (isFull) {
-            actionBtnHtml = `
-                <button type="button" 
-                        onclick="event.stopPropagation(); window.location.href='/Events/Details/${ev.id}'" 
-                        class="w-full py-3 px-3 rounded-xl bg-slate-700 hover:bg-slate-800 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
-                    <i data-lucide="lock" class="w-4 h-4 shrink-0"></i>
-                    <span class="truncate">Dolu — İncele</span>
-                </button>`;
         } else {
-            // Açık sekmesindeki standart "Gönüllü Ol (+1)" butonu
+            // 6. AÇIK İLANLARDA GİRİŞ YAPMIŞ GÖNÜLLÜ: Gönüllü Ol Butonu
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
