@@ -233,7 +233,7 @@ const KampusImeceApp = {
             } else if (this.activeFilter === 'almost-full') {
                 statusMatch = !isFull && !isCompleted && remaining <= 2 && remaining > 0;
             } else if (this.activeFilter === 'full') {
-                statusMatch = isFull || isCompleted;
+                statusMatch = isFull && !isCompleted;
             }
 
             // 2. Arama Kelimesi Filtresi
@@ -451,10 +451,10 @@ const KampusImeceApp = {
         const currentPhotoMode = this.photoViews[ev.id] || (isCompleted && ev.afterImageUrl ? 'after' : 'before');
         const displayImageUrl = (currentPhotoMode === 'after' && ev.afterImageUrl) ? ev.afterImageUrl : ev.imageUrl;
 
-        // Durum / Kontenjan Rozeti (Sağ Üst Rozet)
+        // Durum / Kontenjan Rozeti (Sağ Üst Rozet - Tüm sekmelerde ve kartlarda standart)
         let statusBadge = '';
         if (isCompleted) {
-            statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-teal-600 text-white shadow-sm whitespace-nowrap"><i data-lucide="sparkles" class="w-3 h-3"></i> Temizlendi</span>`;
+            statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-600 text-white shadow-sm whitespace-nowrap">Temizlendi</span>`;
         } else if (isFull) {
             statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-700 text-white shadow-sm whitespace-nowrap">Dolu (${ev.requiredVolunteers})</span>`;
         } else if (remaining <= 2 && remaining > 0) {
@@ -469,23 +469,27 @@ const KampusImeceApp = {
             if (ev.isCreator) {
                 actionBtnHtml = `
                     <div class="grid grid-cols-2 gap-2 w-full">
-                        <div class="py-2.5 px-3 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 border border-teal-200 dark:border-teal-800 truncate">
-                            <i data-lucide="check-circle-2" class="w-4 h-4 text-teal-600 shrink-0"></i>
-                            <span class="truncate">Tamamlandı</span>
-                        </div>
                         <button type="button" 
                                 onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
-                                class="py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
-                            <i data-lucide="camera" class="w-4 h-4"></i>
+                                class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
+                            <i data-lucide="camera" class="w-4 h-4 shrink-0"></i>
                             <span>${ev.afterImageUrl ? 'Sonrası Foto' : 'Sonrası Ekle'}</span>
+                        </button>
+                        <button type="button" 
+                                onclick="event.stopPropagation(); KampusImeceApp.deleteEvent('${ev.id}')" 
+                                class="w-full py-2.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap">
+                            <i data-lucide="trash-2" class="w-4 h-4 shrink-0"></i>
+                            <span>İlanı Sil</span>
                         </button>
                     </div>`;
             } else {
                 actionBtnHtml = `
-                    <div class="w-full py-2.5 px-3 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-800 dark:text-teal-300 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 border border-teal-200 dark:border-teal-800">
-                        <i data-lucide="check-circle-2" class="w-4 h-4 text-teal-600 shrink-0"></i>
+                    <button type="button" 
+                            onclick="event.stopPropagation(); window.location.href='/Events/Details/${ev.id}'" 
+                            class="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 transition active:scale-95">
+                        <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i>
                         <span>Temizlik Tamamlandı</span>
-                    </div>`;
+                    </button>`;
             }
         } else if (ev.isCreator) {
             actionBtnHtml = `
@@ -629,19 +633,19 @@ const KampusImeceApp = {
                         </span>
                     </div>
 
-                    <!-- Katılım / İlerleme Çubuğu (Progress Area) -->
+                    <!-- Katılım / İlerleme Çubuğu (Progress Area - Tüm sekmelerdeki kartlarla birebir standart) -->
                     <div class="space-y-1.5 mb-2">
                         <div class="flex items-center justify-between text-xs">
                             <span class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium">
-                                <i data-lucide="${isCompleted ? 'sparkles' : 'users'}" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
-                                <span>${isCompleted ? 'Temizlik Durumu' : 'Gönüllü Katılımı'}</span>
+                                <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
+                                <span>Gönüllü Katılımı</span>
                             </span>
-                            <span class="font-bold ${isCompleted ? 'text-teal-600 dark:text-teal-400' : (isFull ? 'text-slate-700 dark:text-slate-300' : 'text-slate-800 dark:text-slate-200')}">
-                                ${isCompleted ? 'Tamamlandı' : `${ev.currentParticipantsCount} / ${ev.requiredVolunteers}`}
+                            <span class="font-bold ${isCompleted ? 'text-emerald-600 dark:text-emerald-400' : (isFull ? 'text-slate-700 dark:text-slate-300' : 'text-slate-800 dark:text-slate-200')}">
+                                ${ev.currentParticipantsCount} / ${ev.requiredVolunteers}
                             </span>
                         </div>
                         <div class="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                            <div class="h-full rounded-full transition-all ${isCompleted ? 'bg-teal-500' : (isFull ? 'bg-slate-500' : 'bg-emerald-500')}" style="width: ${isCompleted ? 100 : percent}%"></div>
+                            <div class="h-full rounded-full transition-all ${isCompleted ? 'bg-emerald-500' : (isFull ? 'bg-slate-500' : 'bg-emerald-500')}" style="width: ${isCompleted ? 100 : percent}%"></div>
                         </div>
                     </div>
 
