@@ -463,32 +463,41 @@ const KampusImeceApp = {
             statusBadge = `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500 text-white shadow-sm whitespace-nowrap">${remaining} Kişi</span>`;
         }
 
-        // BUTON EYLEMLERİ (Net, Tekil, Taşmayan ve Kartın Tabanına Kilitli)
+        // BUTON EYLEMLERİ (Net, Tekil, Taşmayan, Kısaltılmış ve Kartın Tabanına Kilitli)
         let actionBtnHtml = '';
-        if (isCompleted) {
+        if (!isAuth) {
+            // GİRİŞ YAPMAMIŞ KULLANICI (Tüm sekmelerde standart "Giriş Yap / Katıl" butonu)
+            actionBtnHtml = `
+                <a href="/Auth/Login" 
+                   onclick="event.stopPropagation();" 
+                   class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
+                    <i data-lucide="log-in" class="w-4 h-4 shrink-0"></i>
+                    <span class="truncate">Giriş Yap / Katıl</span>
+                </a>`;
+        } else if (isCompleted) {
             if (ev.isCreator) {
                 actionBtnHtml = `
                     <div class="grid grid-cols-2 gap-2 w-full">
                         <button type="button" 
                                 onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
-                                class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
+                                class="w-full py-2.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
                             <i data-lucide="camera" class="w-4 h-4 shrink-0"></i>
-                            <span>${ev.afterImageUrl ? 'Sonrası Foto' : 'Sonrası Ekle'}</span>
+                            <span class="truncate">${ev.afterImageUrl ? 'Sonrası Foto' : 'Sonrası Ekle'}</span>
                         </button>
                         <button type="button" 
                                 onclick="event.stopPropagation(); KampusImeceApp.deleteEvent('${ev.id}')" 
-                                class="w-full py-2.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap">
+                                class="w-full py-2.5 px-2 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-1 transition active:scale-95 whitespace-nowrap truncate">
                             <i data-lucide="trash-2" class="w-4 h-4 shrink-0"></i>
-                            <span>İlanı Sil</span>
+                            <span class="truncate">İlanı Sil</span>
                         </button>
                     </div>`;
             } else {
                 actionBtnHtml = `
                     <button type="button" 
                             onclick="event.stopPropagation(); window.location.href='/Events/Details/${ev.id}'" 
-                            class="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 transition active:scale-95">
+                            class="w-full py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700 transition active:scale-95 whitespace-nowrap truncate">
                         <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-600 shrink-0"></i>
-                        <span>Temizlik Tamamlandı</span>
+                        <span class="truncate">Temizlendi</span>
                     </button>`;
             }
         } else if (ev.isCreator) {
@@ -496,15 +505,15 @@ const KampusImeceApp = {
                 <div class="grid grid-cols-2 gap-2 w-full">
                     <button type="button" 
                             onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
-                            class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
+                            class="w-full py-2.5 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
                         <i data-lucide="camera" class="w-4 h-4 shrink-0"></i>
-                        <span>Sonrası Ekle</span>
+                        <span class="truncate">Sonrası Ekle</span>
                     </button>
                     <button type="button" 
                             onclick="event.stopPropagation(); KampusImeceApp.deleteEvent('${ev.id}')" 
-                            class="w-full py-2.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap">
+                            class="w-full py-2.5 px-2 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-1 transition active:scale-95 whitespace-nowrap truncate">
                         <i data-lucide="trash-2" class="w-4 h-4 shrink-0"></i>
-                        <span>İlanı Sil</span>
+                        <span class="truncate">İlanı Sil</span>
                     </button>
                 </div>`;
         } else if (ev.hasCurrentUserJoined) {
@@ -513,45 +522,39 @@ const KampusImeceApp = {
                     <div class="grid grid-cols-2 gap-2 w-full">
                         <button type="button" 
                                 onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
-                                class="w-full py-2.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap">
+                                class="w-full py-2.5 px-2 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-1 transition active:scale-95 whitespace-nowrap truncate">
                             <i data-lucide="user-minus" class="w-4 h-4 shrink-0"></i>
-                            <span>Ayrıl</span>
+                            <span class="truncate">Ayrıl</span>
                         </button>
                         <button type="button" 
                                 onclick="event.stopPropagation(); KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
-                                class="w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
+                                class="w-full py-2.5 px-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1 transition shadow-sm active:scale-95 whitespace-nowrap truncate">
                             <i data-lucide="camera" class="w-4 h-4 shrink-0"></i>
-                            <span>Kanıtla</span>
+                            <span class="truncate">Kanıtla</span>
                         </button>
                     </div>` : `
                     <button type="button" 
                             onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
-                            class="w-full py-2.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition active:scale-95">
+                            class="w-full py-2.5 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 text-rose-600 dark:text-rose-400 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap truncate">
                         <i data-lucide="user-minus" class="w-4 h-4 shrink-0"></i>
-                        <span>Katılımı İptal Et</span>
+                        <span class="truncate">Ayrıl</span>
                     </button>`}`;
         } else if (isFull) {
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation();" 
                         disabled 
-                        class="w-full py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-medium text-xs sm:text-sm flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-700 cursor-not-allowed">
+                        class="w-full py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700 cursor-not-allowed whitespace-nowrap truncate">
                     <i data-lucide="lock" class="w-4 h-4 shrink-0"></i>
-                    <span>Kontenjan Doldu</span>
+                    <span class="truncate">Kontenjan Doldu</span>
                 </button>`;
-        } else if (!isAuth) {
-            actionBtnHtml = `
-                <a href="/Auth/Login" onclick="event.stopPropagation();" class="w-full border border-slate-200 dark:border-slate-700 hover:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-medium py-2.5 rounded-xl transition-colors flex items-center justify-center gap-2 text-xs sm:text-sm">
-                    <i data-lucide="log-in" class="w-4 h-4"></i>
-                    <span>Giriş Yap ve Katıl</span>
-                </a>`;
         } else {
             actionBtnHtml = `
                 <button type="button" 
                         onclick="event.stopPropagation(); KampusImeceApp.toggleJoin('${ev.id}', this)" 
-                        class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors shadow-sm active:scale-95">
-                    <i data-lucide="hand" class="w-4 h-4"></i>
-                    <span>Gönüllü Ol (+1)</span>
+                        class="w-full py-2.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-colors shadow-sm active:scale-95 whitespace-nowrap truncate">
+                    <i data-lucide="hand" class="w-4 h-4 shrink-0"></i>
+                    <span class="truncate">Gönüllü Ol (+1)</span>
                 </button>`;
         }
 
@@ -593,28 +596,28 @@ const KampusImeceApp = {
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
 
                     <!-- Sol Üst: Konum Etiketi -->
-                    <div class="absolute top-2.5 left-2.5 z-10">
-                        <span class="bg-black/50 backdrop-blur-sm text-white text-xs px-2.5 py-1 rounded-full flex items-center gap-1 max-w-[150px] shadow-sm">
-                            <i data-lucide="map-pin" class="w-3.5 h-3.5 text-emerald-400 shrink-0"></i>
+                    <div class="absolute top-2.5 left-2.5 z-10 max-w-[50%]">
+                        <span class="bg-black/60 backdrop-blur-sm text-white text-[11px] px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm truncate">
+                            <i data-lucide="map-pin" class="w-3 h-3 text-emerald-400 shrink-0"></i>
                             <span class="truncate">${this.escapeHtml(ev.locationName)}</span>
                         </span>
                     </div>
 
                     <!-- Sağ Üst: Durum/Kontenjan Rozeti & Raporlama İkonu -->
-                    <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
+                    <div class="absolute top-2.5 right-2.5 flex items-center gap-1 z-10 max-w-[50%] justify-end">
                         ${statusBadge}
                         <button type="button" 
                                 onclick="event.stopPropagation(); KampusImeceApp.openReportModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
                                 title="Moderatöre Bildir" 
-                                class="bg-black/40 backdrop-blur-sm p-1.5 rounded-full text-white hover:bg-black/60 transition-colors active:scale-95 shadow-sm flex items-center justify-center">
-                            <i data-lucide="flag" class="w-3.5 h-3.5"></i>
+                                class="bg-black/50 backdrop-blur-sm p-1 rounded-full text-white hover:bg-black/70 transition-colors active:scale-95 shadow-sm flex items-center justify-center shrink-0">
+                            <i data-lucide="flag" class="w-3 h-3"></i>
                         </button>
                     </div>
 
                     <!-- Sol Alt: Tarih Bilgisi -->
-                    <div class="absolute bottom-2.5 left-2.5 text-white text-xs font-medium flex items-center gap-1.5 drop-shadow">
+                    <div class="absolute bottom-2.5 left-2.5 text-white text-[11px] font-medium flex items-center gap-1 drop-shadow max-w-[55%] truncate">
                         <i data-lucide="calendar" class="w-3.5 h-3.5 text-emerald-300 shrink-0"></i>
-                        <span>${formattedDate}</span>
+                        <span class="truncate">${formattedDate}</span>
                     </div>
 
                     <!-- Sağ Alt: Öncesi/Sonrası Butonu -->
@@ -624,23 +627,23 @@ const KampusImeceApp = {
                 <!-- 3. KART GÖVDESİ (BODY) & DETAYLAR -->
                 <div class="p-4 flex flex-col flex-1">
                     <!-- Başlık ve Detay Linki -->
-                    <div class="flex items-start justify-between gap-2 mb-3">
-                        <h4 class="font-semibold text-slate-800 dark:text-white line-clamp-2 min-h-[3rem] text-sm leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex-1" title="${this.escapeHtml(ev.title)}">
+                    <div class="flex items-start justify-between gap-2 mb-2.5 min-h-[2.75rem]">
+                        <h4 class="font-semibold text-slate-800 dark:text-white line-clamp-2 text-xs sm:text-sm leading-snug group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors flex-1" title="${this.escapeHtml(ev.title)}">
                             ${this.escapeHtml(ev.title)}
                         </h4>
-                        <span class="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 text-sm font-medium shrink-0 flex items-center gap-0.5 pt-0.5 whitespace-nowrap">
-                            <span>Detay</span> <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        <span class="text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 text-xs font-semibold shrink-0 flex items-center gap-0.5 pt-0.5 whitespace-nowrap">
+                            <span>Detay</span> <i data-lucide="chevron-right" class="w-3.5 h-3.5 shrink-0"></i>
                         </span>
                     </div>
 
                     <!-- Katılım / İlerleme Çubuğu (Progress Area - Tüm sekmelerdeki kartlarla birebir standart) -->
                     <div class="space-y-1.5 mb-2">
-                        <div class="flex items-center justify-between text-xs">
-                            <span class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium">
-                                <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
-                                <span>Gönüllü Katılımı</span>
+                        <div class="flex items-center justify-between text-xs gap-2">
+                            <span class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium truncate">
+                                <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+                                <span class="truncate">Gönüllü Katılımı</span>
                             </span>
-                            <span class="font-bold ${isCompleted ? 'text-emerald-600 dark:text-emerald-400' : (isFull ? 'text-slate-700 dark:text-slate-300' : 'text-slate-800 dark:text-slate-200')}">
+                            <span class="font-bold text-slate-800 dark:text-slate-200 shrink-0 whitespace-nowrap">
                                 ${ev.currentParticipantsCount} / ${ev.requiredVolunteers}
                             </span>
                         </div>
