@@ -66,6 +66,27 @@
         .dark .leaflet-tile-pane {
             filter: brightness(0.85) contrast(1.1);
         }
+        /* Leaflet popup içindeki buton linklerinin mavi olmasını engelle, beyaz yap */
+        .leaflet-popup-content a.btn-popup-details,
+        .leaflet-popup-content a.btn-popup-details span {
+            color: #ffffff !important;
+            text-decoration: none !important;
+        }
+        /* Mobilde ve masaüstünde kart fotoğraflarının tam kare görünmesini garantile */
+        .event-card-img-container {
+            width: 100% !important;
+            aspect-ratio: 1 / 1 !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        .event-card-img-container img {
+            width: 100% !important;
+            height: 100% !important;
+            aspect-ratio: 1 / 1 !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            display: block !important;
+        }
         @if (isMapPage) {
             <text>
             /* Harita sayfasında pencere kaymasını ve çift dokunma zıplamasını engelle */

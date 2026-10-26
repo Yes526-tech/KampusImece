@@ -260,6 +260,22 @@ const KampusImeceApp = {
         this.renderCards(this.filteredEvents);
         this.updateStatsCounters(this.filteredEvents);
 
+        // Masaüstü İlan Başlığı ve Sayacını Güncelle (Harita ile Simetrik & Net)
+        const headingEl = document.getElementById('activeFilterHeading');
+        const countBadgeEl = document.getElementById('activeFilterCountBadge');
+        if (headingEl) {
+            const headings = {
+                'all': 'Tüm Kampüs İlanları',
+                'open': 'Açık İlanlar (Gönüllü Bekleyen)',
+                'almost-full': 'Az Kalan İlanlar (Son 1-2 Kişi)',
+                'full': 'Dolu ve Tamamlanan İlanlar'
+            };
+            headingEl.textContent = headings[this.activeFilter] || 'Kampüs İlanları';
+        }
+        if (countBadgeEl) {
+            countBadgeEl.textContent = `${this.filteredEvents.length} İlan`;
+        }
+
         if (this.map) {
             setTimeout(() => this.map.invalidateSize(), 100);
         }
@@ -351,16 +367,16 @@ const KampusImeceApp = {
                             ${isCompleted ? 'Temizlendi ✨' : `${ev.currentParticipantsCount} / ${ev.requiredVolunteers}`}
                         </strong>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <a href="/Events/Details/${ev.id}" class="flex-1 py-1.5 px-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold transition flex items-center justify-center gap-1 text-center shadow-sm active:scale-95">
-                            <i data-lucide="arrow-right-circle" class="w-3.5 h-3.5"></i>
-                            <span>İlana Git</span>
+                    <div class="flex items-center gap-1.5 mt-2 pt-1 border-t border-slate-100">
+                        <a href="/Events/Details/${ev.id}" 
+                           style="color: #ffffff !important; text-decoration: none !important;" 
+                           class="btn-popup-details flex-1 py-1.5 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 !text-white text-xs font-bold transition flex items-center justify-center text-center shadow-sm active:scale-95">
+                            <span style="color: #ffffff !important;">İlana Git</span>
                         </a>
-                        <button onclick="KampusImeceApp.openReportModal('${ev.id}', '${this.escapeHtml(ev.title)}')" title="Uygunsuz İlanı Bildir" class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-500 text-[10px] border border-slate-200 transition">
-                            <i data-lucide="flag" class="w-3.5 h-3.5"></i>
-                        </button>
                         ${ev.isCreator && !isCompleted ? `
-                            <button onclick="KampusImeceApp.deleteEvent('${ev.id}')" title="İlanı Kalıcı Olarak Sil" class="py-1.5 px-2 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 text-[10px] font-bold border border-rose-200 transition">
+                            <button onclick="KampusImeceApp.deleteEvent('${ev.id}')" 
+                                    title="İlanı Kalıcı Olarak Sil" 
+                                    class="py-1.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 text-xs font-bold border border-rose-200 transition active:scale-95">
                                 Sil
                             </button>` : ''}
                     </div>
@@ -598,8 +614,12 @@ const KampusImeceApp = {
                  onclick="window.location.href='/Events/Details/${ev.id}'" 
                  class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500/40 dark:hover:border-emerald-500/40 transition-all duration-200 flex flex-col overflow-hidden group cursor-pointer active:scale-[0.99] w-full max-w-md sm:max-w-none mx-auto">
                 <!-- ÜST RESİM VE ROZETLER (KARE & FERAH MİMARİ) -->
-                <div class="relative w-full aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                    <img id="event-img-${ev.id}" src="${displayImageUrl}" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" alt="${this.escapeHtml(ev.title)}" />
+                <div class="event-card-img-container relative w-full aspect-square overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0" style="aspect-ratio: 1 / 1 !important; width: 100% !important;">
+                    <img id="event-img-${ev.id}" 
+                         src="${displayImageUrl}" 
+                         style="aspect-ratio: 1 / 1 !important; width: 100% !important; height: 100% !important; object-fit: cover !important; object-position: center !important;" 
+                         class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500" 
+                         alt="${this.escapeHtml(ev.title)}" />
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
 
                     <!-- Sol Üst: Konum (Taşmayan, Temiz Etiket) -->
@@ -635,11 +655,11 @@ const KampusImeceApp = {
                 <div class="p-3 flex-1 flex flex-col justify-between">
                     <div>
                         <!-- Başlık & Detay Oku (2 satıra kadar net okunaklı, boy hizalı) -->
-                        <div class="flex items-start justify-between gap-1.5 min-h-[2rem]">
-                            <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title="${this.escapeHtml(ev.title)}">
+                        <div class="flex items-start justify-between gap-1.5 min-h-[2.25rem]">
+                            <h4 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title="${this.escapeHtml(ev.title)}">
                                 ${this.escapeHtml(ev.title)}
                             </h4>
-                            <span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold shrink-0 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 pt-0.5">
+                            <span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-semibold shrink-0 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5 pt-0.5 whitespace-nowrap">
                                 Detay <i data-lucide="chevron-right" class="w-3 h-3"></i>
                             </span>
                         </div>
@@ -1240,18 +1260,23 @@ const KampusImeceApp = {
             modal.classList.add('flex');
             document.body.classList.add('overflow-hidden');
 
+            this.resetPhotoPreview();
+            this.resetCreateAfterPhotoPreview();
+
             this.initModalPickerMap();
 
             setTimeout(() => {
                 if (this.modalMap) {
                     this.modalMap.invalidateSize();
                 }
+                if (window.lucide) lucide.createIcons();
             }, 150);
 
             setTimeout(() => {
                 if (this.modalMap) {
                     this.modalMap.invalidateSize();
                 }
+                if (window.lucide) lucide.createIcons();
             }, 350);
 
             const dateInput = form.querySelector('input[name="ScheduledAt"]');
@@ -1262,6 +1287,8 @@ const KampusImeceApp = {
                 tomorrow.setMinutes(tomorrow.getMinutes() - tomorrow.getTimezoneOffset());
                 dateInput.value = tomorrow.toISOString().slice(0, 16);
             }
+
+            if (window.lucide) lucide.createIcons();
         };
 
         window.closeCreateModal = () => {
@@ -1371,7 +1398,7 @@ const KampusImeceApp = {
                     return;
                 }
 
-                btnGps.innerHTML = `<i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin"></i> Konum Alınıyor...`;
+                btnGps.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 text-white animate-spin"></i> <span class="whitespace-nowrap">Alınıyor...</span>`;
                 if (window.lucide) lucide.createIcons();
 
                 navigator.geolocation.getCurrentPosition(
@@ -1379,17 +1406,17 @@ const KampusImeceApp = {
                         const lat = pos.coords.latitude;
                         const lng = pos.coords.longitude;
                         this.setModalLocation(lat, lng);
-                        btnGps.innerHTML = `<i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Konum Alındı!`;
+                        btnGps.innerHTML = `<i data-lucide="check" class="w-3 h-3 text-white"></i> <span class="whitespace-nowrap">Alındı!</span>`;
                         if (window.lucide) lucide.createIcons();
                         setTimeout(() => {
-                            btnGps.innerHTML = `<i data-lucide="navigation" class="w-3.5 h-3.5"></i> Mevcut GPS Konumumu Al`;
+                            btnGps.innerHTML = `<i data-lucide="navigation" class="w-3 h-3 text-white"></i> <span class="whitespace-nowrap">Konumumu Al</span>`;
                             if (window.lucide) lucide.createIcons();
                         }, 2000);
                     },
                     (err) => {
                         console.warn('GPS Hatası:', err);
                         alert('Konum alınamadı. Lütfen tarayıcı izinlerinizi kontrol edin veya haritaya tıklayarak seçin.');
-                        btnGps.innerHTML = `<i data-lucide="navigation" class="w-3.5 h-3.5"></i> Mevcut GPS Konumumu Al`;
+                        btnGps.innerHTML = `<i data-lucide="navigation" class="w-3 h-3 text-white"></i> <span class="whitespace-nowrap">Konumumu Al</span>`;
                         if (window.lucide) lucide.createIcons();
                     },
                     { enableHighAccuracy: true, timeout: 8000 }
@@ -1510,10 +1537,17 @@ const KampusImeceApp = {
         });
 
         if (removeBtn) {
-            removeBtn.addEventListener('click', () => {
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.resetPhotoPreview();
             });
         }
+
+        dropZone.addEventListener('click', (e) => {
+            if (e.target !== fileInput && !e.target.closest('#photoPreviewContainer')) {
+                fileInput.click();
+            }
+        });
     },
 
     handleFileSelected: function (file) {
@@ -1613,10 +1647,17 @@ const KampusImeceApp = {
         });
 
         if (removeBtn) {
-            removeBtn.addEventListener('click', () => {
+            removeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
                 this.resetCreateAfterPhotoPreview();
             });
         }
+
+        dropZone.addEventListener('click', (e) => {
+            if (e.target !== fileInput && !e.target.closest('#createAfterPhotoPreviewContainer')) {
+                fileInput.click();
+            }
+        });
     },
 
     handleCreateAfterFileSelected: function (file) {
