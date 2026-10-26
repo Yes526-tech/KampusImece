@@ -384,6 +384,27 @@ const KampusImeceApp = {
             `;
 
             marker.bindPopup(popupHtml);
+
+            // Haritada pine tıklanınca: Sağdaki kartın etrafını yeşil yap ve karta odaklan
+            marker.on('click', () => {
+                this.highlightCard(ev.id);
+            });
+
+            // Haritada pinin üzerine gelince (hover): Sağdaki kartın etrafını yeşil ring yap
+            marker.on('mouseover', () => {
+                const card = document.getElementById('event-card-' + ev.id);
+                if (card) {
+                    card.classList.add('ring-2', 'ring-emerald-500', '!border-emerald-500');
+                }
+            });
+
+            marker.on('mouseout', () => {
+                const card = document.getElementById('event-card-' + ev.id);
+                if (card && !card.classList.contains('highlighted-event-card')) {
+                    card.classList.remove('ring-2', 'ring-emerald-500', '!border-emerald-500');
+                }
+            });
+
             this.markersLayer.addLayer(marker);
             this.eventMarkers[ev.id] = marker;
         });
@@ -529,8 +550,10 @@ const KampusImeceApp = {
 
         return `
             <div id="event-card-${ev.id}" 
+                 onmouseenter="KampusImeceApp.onCardHover('${ev.id}', true)" 
+                 onmouseleave="KampusImeceApp.onCardHover('${ev.id}', false)" 
                  onclick="window.location.href='/Events/Details/${ev.id}'" 
-                 class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow flex flex-col h-full min-h-[460px] overflow-hidden group cursor-pointer active:scale-[0.99] w-full mx-auto">
+                 class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full min-h-[460px] overflow-hidden group cursor-pointer active:scale-[0.99] w-full mx-auto">
                 
                 <!-- 2. GÖRSEL ALANI & ÜZERİNDEKİ ROZETLER (16:9 Aspect Video) -->
                 <div class="aspect-video w-full rounded-t-2xl overflow-hidden relative shrink-0 bg-slate-100 dark:bg-slate-800">
@@ -1657,15 +1680,79 @@ const KampusImeceApp = {
         });
     },
 
-    // 14. YARDIMCI METOTLAR
-    scrollToCard: function (eventId) {
+    // 14. YARDIMCI METOTLAR (HARİTA & KART ETKİLEŞİMİ)
+    highlightCard: function (eventId) {
         const card = document.getElementById('event-card-' + eventId);
-        if (card) {
-            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            card.classList.add('ring-4', 'ring-emerald-500', 'ring-offset-2');
-            setTimeout(() => {
-                card.classList.remove('ring-4', 'ring-emerald-500', 'ring-offset-2');
-            }, 1800);
+        if (!card) return;
+
+        // Mobilde eğer kartlar sekmesi gizliyse, otomatik olarak kartlar sekmesine geçir
+        const cardsTabBtn = document.getElementById('tabBtnCards');
+        if (cardsTabBtn && window.innerWidth < 1024) {
+            cardsTabBtn.click();
+        }
+
+        // Önceki tüm vurgulamaları temizle
+        document.querySelectorAll('.highlighted-event-card').forEach(el => {
+            el.classList.remove(
+                'highlighted-event-card', 
+                'ring-4', 
+                'ring-emerald-500', 
+                'ring-offset-2', 
+                'dark:ring-offset-slate-900', 
+                '!border-emerald-500', 
+                'shadow-2xl', 
+                'shadow-emerald-500/30'
+            );
+        });
+
+        // Kartı sağdaki listede ortala
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Kartın etrafını parlak yeşil çerçeve ve gölge ile sar
+        card.classList.add(
+            'highlighted-event-card', 
+            'ring-4', 
+            'ring-emerald-500', 
+            'ring-offset-2', 
+            'dark:ring-offset-slate-900', 
+            '!border-emerald-500', 
+            'shadow-2xl', 
+            'shadow-emerald-500/30'
+        );
+
+        // 3.5 saniye sonra vurguyu kaldır
+        clearTimeout(card._highlightTimeout);
+        card._highlightTimeout = setTimeout(() => {
+            card.classList.remove(
+                'highlighted-event-card', 
+                'ring-4', 
+                'ring-emerald-500', 
+                'ring-offset-2', 
+                'dark:ring-offset-slate-900', 
+                '!border-emerald-500', 
+                'shadow-2xl', 
+                'shadow-emerald-500/30'
+            );
+        }, 3500);
+    },
+
+    scrollToCard: function (eventId) {
+        this.highlightCard(eventId);
+    },
+
+    onCardHover: function (eventId, isHovering) {
+        const marker = this.eventMarkers ? this.eventMarkers[eventId] : null;
+        if (!marker) return;
+        const iconEl = marker.getElement();
+        if (iconEl) {
+            if (isHovering) {
+                iconEl.style.transition = 'transform 0.2s ease';
+                iconEl.style.transform += ' scale(1.25)';
+                iconEl.style.zIndex = '1000';
+            } else {
+                iconEl.style.transform = iconEl.style.transform.replace(' scale(1.25)', '');
+                iconEl.style.zIndex = '';
+            }
         }
     },
 
