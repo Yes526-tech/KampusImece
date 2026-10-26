@@ -68,11 +68,11 @@
         </div>
     </div>
 
-    <!-- ANA GÖVDE: SPLIT VIEW (SOL: CANLI HARİTA, SAĞ: KARTLAR) -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 items-stretch overflow-hidden">
+    <!-- ANA GÖVDE: SPLIT VIEW (SOL: CANLI HARİTA, SAĞ: 3'LÜ YAN YANA KARTLAR) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 min-h-0 items-stretch overflow-hidden">
 
         <!-- SOL: CANLI HARİTA (Masaüstünde Sayfaya Tam Sığar) -->
-        <div class="lg:col-span-6 xl:col-span-7 flex flex-col h-[360px] lg:h-full min-h-0">
+        <div class="lg:col-span-5 xl:col-span-4 flex flex-col h-[340px] lg:h-full min-h-0">
             <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2.5 shadow-sm transition-colors flex flex-col h-full min-h-0">
                 <div class="flex items-center justify-between px-2.5 py-1 mb-1 text-xs shrink-0">
                     <div class="flex items-center gap-2">
@@ -100,8 +100,8 @@
             </div>
         </div>
 
-        <!-- SAĞ: ETKİNLİK KARTLARI (Kendi İçinde Kaydırılabilir) -->
-        <div class="lg:col-span-6 xl:col-span-5 flex flex-col h-full min-h-0 overflow-hidden">
+        <!-- SAĞ: ETKİNLİK KARTLARI (Masaüstünde Yan Yana 3 Kart) -->
+        <div class="lg:col-span-7 xl:col-span-8 flex flex-col h-full min-h-0 overflow-hidden">
             <div id="loadingIndicator" class="hidden py-8 text-center shrink-0">
                 <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 shadow-sm">
                     <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-emerald-600"></i>
@@ -109,8 +109,8 @@
                 </div>
             </div>
 
-            <!-- Kart Listesi (Sadece bu alan kayar, harita sabit kalır) -->
-            <div id="eventsListContainer" class="flex-1 overflow-y-auto pr-1 pb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3 scrollbar-thin">
+            <!-- Kart Listesi (Masaüstünde 3'lü Yan Yana Grid, İçten Kaydırılabilir) -->
+            <div id="eventsListContainer" class="flex-1 overflow-y-auto pr-1.5 pb-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-3.5 scrollbar-thin">
                 <!-- JavaScript (app.js) tarafından doldurulur -->
             </div>
         </div>

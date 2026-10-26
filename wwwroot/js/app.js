@@ -284,20 +284,20 @@ const KampusImeceApp = {
         if (window.lucide) lucide.createIcons();
     },
 
-    // 5. ETKİNLİK KARTLARINI RENDER ETME (MİNİMALİST, FERAH & DENGELİ GÖRÜNÜM)
+    // 5. ETKİNLİK KARTLARINI RENDER ETME (3'LÜ YAN YANA, FERAH & TAŞMAYAN MİMARİ)
     renderCards: function (events) {
         const container = document.getElementById('eventsListContainer');
         if (!container) return;
 
         if (events.length === 0) {
             container.innerHTML = `
-                <div class="col-span-full py-8 text-center bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 p-5 transition-colors">
-                    <div class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center mb-2">
-                        <i data-lucide="inbox" class="w-4 h-4"></i>
+                <div class="col-span-full py-10 text-center bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 transition-colors shadow-sm">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 mx-auto flex items-center justify-center mb-2">
+                        <i data-lucide="inbox" class="w-5 h-5"></i>
                     </div>
-                    <h4 class="text-xs font-semibold text-slate-800 dark:text-white">İlan Bulunamadı</h4>
-                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Filtrelere uygun kirlilik noktası bulunmuyor.</p>
-                    <button onclick="window.openCreateModal()" class="mt-2.5 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
+                    <h4 class="text-sm font-bold text-slate-800 dark:text-white">İlan Bulunamadı</h4>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Seçilen filtrelere uygun kirlilik noktası bulunmuyor.</p>
+                    <button onclick="window.openCreateModal()" class="mt-3 px-3.5 py-1.5 rounded-xl bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition shadow-sm">
                         İlk Noktayı Bildir
                     </button>
                 </div>`;
@@ -318,132 +318,138 @@ const KampusImeceApp = {
             const currentPhotoMode = this.photoViews[ev.id] || (isCompleted && ev.afterImageUrl ? 'after' : 'before');
             const displayImageUrl = (currentPhotoMode === 'after' && ev.afterImageUrl) ? ev.afterImageUrl : ev.imageUrl;
 
-            // Minimal Durum Rozeti (Frosted Glass Pill)
+            // Durum Rozeti (Frosted Glass Pill)
             let statusBadge = '';
             if (isCompleted) {
-                statusBadge = `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-700/90 text-white backdrop-blur shadow-sm"><i data-lucide="sparkles" class="w-2.5 h-2.5"></i> Temizlendi</span>`;
+                statusBadge = `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-700/90 text-white backdrop-blur shadow-sm"><i data-lucide="sparkles" class="w-3 h-3"></i> Temizlendi</span>`;
             } else if (isFull) {
-                statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-900/80 text-white backdrop-blur">Dolu (${ev.requiredVolunteers}/${ev.requiredVolunteers})</span>`;
+                statusBadge = `<span class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-slate-900/85 text-white backdrop-blur shadow-sm">Dolu (${ev.requiredVolunteers}/${ev.requiredVolunteers})</span>`;
             } else if (remaining === 1) {
-                statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-600/90 text-white backdrop-blur">Son 1</span>`;
+                statusBadge = `<span class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-amber-600/90 text-white backdrop-blur shadow-sm">Son 1 Kişi</span>`;
             } else {
-                statusBadge = `<span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-600/90 text-white backdrop-blur">${remaining} Aranıyor</span>`;
+                statusBadge = `<span class="px-2.5 py-1 rounded-lg text-[10px] font-semibold bg-emerald-600/90 text-white backdrop-blur shadow-sm">${remaining} Kişi Aranıyor</span>`;
             }
 
-            // Katılımcı Avatarları (Daha kompakt & minimal)
-            let avatarsHtml = `<div class="flex items-center -space-x-1 overflow-hidden">`;
+            // Katılımcı Avatarları
+            let avatarsHtml = `<div class="flex items-center -space-x-1.5 overflow-hidden shrink-0">`;
             (ev.participantsList || []).slice(0, 3).forEach(p => {
                 avatarsHtml += `
                     <div title="${this.escapeHtml(p.fullName)}" 
-                         class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[8px] font-bold ring-1.5 ring-white dark:ring-slate-900">
+                         class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 dark:bg-slate-700 text-white text-[9px] font-bold ring-2 ring-white dark:ring-slate-900">
                         ${this.escapeHtml(p.initials)}
                     </div>`;
             });
             if (ev.participantsList && ev.participantsList.length > 3) {
                 avatarsHtml += `
-                    <div class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[8px] font-bold ring-1.5 ring-white dark:ring-slate-900">
+                    <div class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[9px] font-bold ring-2 ring-white dark:ring-slate-900">
                         +${ev.participantsList.length - 3}
                     </div>`;
             }
             avatarsHtml += `</div>`;
 
-            // BUTON EYLEMLERİ (Kompakt, Minimalist ve Yan Yana Hizalı)
+            // BUTON EYLEMLERİ (Net, Tekil, Taşmayan ve İç İçe Girmeyen Yapı)
             let actionBtnHtml = '';
             if (isCompleted) {
                 actionBtnHtml = `
-                    <div class="w-full py-1.5 px-2.5 rounded-lg bg-emerald-50/80 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300 font-medium text-[11px] flex items-center justify-center gap-1.5 border border-emerald-200/60 dark:border-emerald-900/40">
-                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
-                        <span>Tamamlandı (+30 Puan)</span>
+                    <div class="w-full py-2 px-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 font-semibold text-xs flex items-center justify-center gap-1.5 border border-emerald-200 dark:border-emerald-800">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+                        <span>Temizlik Tamamlandı (+30 Puan)</span>
                     </div>`;
             } else if (!isAuth) {
                 actionBtnHtml = `
-                    <a href="/Auth/Login" class="w-full py-1.5 px-2.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-medium text-[11px] flex items-center justify-center gap-1.5 transition">
-                        <i data-lucide="log-in" class="w-3 h-3"></i>
+                    <a href="/Auth/Login" class="w-full py-2 px-3 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 font-semibold text-xs flex items-center justify-center gap-1.5 transition">
+                        <i data-lucide="log-in" class="w-3.5 h-3.5 shrink-0"></i>
                         <span>Giriş Yap ve Katıl</span>
                     </a>`;
             } else if (ev.isCreator) {
-                // İLAN SAHİBİ: Yan yana iki kompakt buton
+                // İLAN SAHİBİ: Yan yana 2 buton (asla iç içe geçmeyen, taşmayan)
                 actionBtnHtml = `
-                    <div class="grid grid-cols-2 gap-1.5">
+                    <div class="grid grid-cols-2 gap-2">
                         <button type="button" 
                                 onclick="KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
-                                class="w-full py-1.5 px-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[11px] flex items-center justify-center gap-1 transition shadow-sm active:scale-95">
-                            <i data-lucide="camera" class="w-3 h-3"></i>
+                                class="w-full py-2 px-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
+                            <i data-lucide="camera" class="w-3.5 h-3.5 shrink-0"></i>
                             <span>Kanıtla</span>
                         </button>
                         <button type="button" 
                                 onclick="KampusImeceApp.deleteEvent('${ev.id}')" 
-                                class="w-full py-1.5 px-2 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-medium text-[11px] flex items-center justify-center gap-1 transition active:scale-95">
-                            <i data-lucide="trash-2" class="w-3 h-3"></i>
-                            <span>Sil</span>
+                                class="w-full py-2 px-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5 shrink-0"></i>
+                            <span>İlanı Sil</span>
                         </button>
                     </div>`;
             } else if (ev.hasCurrentUserJoined) {
                 // KATILMIŞ DİĞER GÖNÜLLÜLER:
                 actionBtnHtml = `
                     ${ev.canCurrentUserComplete ? `
-                        <div class="grid grid-cols-2 gap-1.5">
+                        <div class="grid grid-cols-2 gap-2">
                             <button type="button" 
                                     onclick="KampusImeceApp.toggleJoin('${ev.id}', this)" 
-                                    class="w-full py-1.5 px-2 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-medium text-[11px] flex items-center justify-center gap-1 transition active:scale-95">
-                                <i data-lucide="user-minus" class="w-3 h-3"></i>
+                                    class="w-full py-2 px-2.5 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition active:scale-95 whitespace-nowrap">
+                                <i data-lucide="user-minus" class="w-3.5 h-3.5 shrink-0"></i>
                                 <span>Ayrıl</span>
                             </button>
                             <button type="button" 
                                     onclick="KampusImeceApp.openCompleteModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
-                                    class="w-full py-1.5 px-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-medium text-[11px] flex items-center justify-center gap-1 transition shadow-sm active:scale-95">
-                                <i data-lucide="camera" class="w-3 h-3"></i>
+                                    class="w-full py-2 px-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95 whitespace-nowrap">
+                                <i data-lucide="camera" class="w-3.5 h-3.5 shrink-0"></i>
                                 <span>Kanıtla</span>
                             </button>
                         </div>` : `
                         <button type="button" 
                                 onclick="KampusImeceApp.toggleJoin('${ev.id}', this)" 
-                                class="w-full py-1.5 px-2.5 rounded-lg border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-medium text-[11px] flex items-center justify-center gap-1.5 transition active:scale-95">
-                            <i data-lucide="user-minus" class="w-3 h-3"></i>
+                                class="w-full py-2 px-3 rounded-xl border border-rose-200 dark:border-rose-900/60 bg-rose-50/70 dark:bg-rose-950/20 hover:bg-rose-100 dark:hover:bg-rose-900/40 text-rose-600 dark:text-rose-400 font-semibold text-xs flex items-center justify-center gap-1.5 transition active:scale-95">
+                            <i data-lucide="user-minus" class="w-3.5 h-3.5 shrink-0"></i>
                             <span>Katılımı İptal Et</span>
                         </button>`}`;
             } else if (isFull) {
                 actionBtnHtml = `
                     <button type="button" 
                             disabled 
-                            class="w-full py-1.5 px-2.5 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-medium text-[11px] flex items-center justify-center gap-1 border border-slate-200 dark:border-slate-700 cursor-not-allowed">
-                        <i data-lucide="lock" class="w-3 h-3"></i>
-                        <span>Kontenjan Dolu</span>
+                            class="w-full py-2 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 font-medium text-xs flex items-center justify-center gap-1.5 border border-slate-200 dark:border-slate-700 cursor-not-allowed">
+                        <i data-lucide="lock" class="w-3.5 h-3.5 shrink-0"></i>
+                        <span>Kontenjan Doldu</span>
                     </button>`;
             } else {
                 actionBtnHtml = `
                     <button type="button" 
                             onclick="KampusImeceApp.toggleJoin('${ev.id}', this)" 
-                            class="w-full py-1.5 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-[11px] flex items-center justify-center gap-1 transition shadow-sm active:scale-95">
-                        <i data-lucide="hand" class="w-3 h-3"></i>
+                            class="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition shadow-sm active:scale-95">
+                        <i data-lucide="hand" class="w-3.5 h-3.5 shrink-0"></i>
                         <span>Katılıyorum (+1)</span>
                     </button>`;
             }
 
-            // Tamamlanma Notu (Minimal)
+            // Tamamlanma Notu
             let completionNoteHtml = '';
             if (isCompleted) {
                 completionNoteHtml = `
-                    <div class="mb-2 px-2.5 py-1.5 rounded-lg bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-100 dark:border-emerald-900/40 text-[10px] text-emerald-800 dark:text-emerald-300">
-                        <p class="truncate italic">"${this.escapeHtml(ev.completionNote || 'Atıklar toplandı ve geri dönüşüme teslim edildi.')}"</p>
+                    <div class="mb-3 p-2.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50">
+                        <div class="flex items-center gap-1.5 text-xs font-semibold text-emerald-800 dark:text-emerald-300 mb-1">
+                            <i data-lucide="check-check" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0"></i>
+                            <span>Temizlik Özeti</span>
+                        </div>
+                        <p class="text-[11px] text-emerald-700 dark:text-emerald-400 italic line-clamp-2">
+                            "${this.escapeHtml(ev.completionNote || 'Atıklar toplandı ve geri dönüşüme teslim edildi.')}"
+                        </p>
                     </div>`;
             }
 
-            // Öncesi / Sonrası Butonları (Frosted Pill)
+            // Öncesi / Sonrası Butonları
             let beforeAfterToggleHtml = '';
             if (isCompleted && ev.afterImageUrl) {
                 beforeAfterToggleHtml = `
-                    <div class="absolute bottom-2 right-2 flex items-center bg-black/50 backdrop-blur-md p-0.5 rounded-full text-[10px] font-medium z-10 border border-white/10">
+                    <div class="absolute bottom-2.5 right-2.5 flex items-center bg-black/60 backdrop-blur-md p-0.5 rounded-lg text-[10px] font-medium z-10 border border-white/10 shadow-sm">
                         <button type="button" 
                                 onclick="event.stopPropagation(); KampusImeceApp.showPhoto('${ev.id}', 'before')" 
                                 id="btn-photo-before-${ev.id}" 
-                                class="px-2 py-0.5 rounded-full transition text-[9px] ${currentPhotoMode === 'before' ? 'bg-emerald-600 text-white font-semibold shadow-sm' : 'text-slate-300 hover:text-white'}">
+                                class="px-2 py-0.5 rounded-md transition ${currentPhotoMode === 'before' ? 'bg-emerald-600 text-white font-semibold shadow' : 'text-slate-300 hover:text-white'}">
                             Öncesi
                         </button>
                         <button type="button" 
                                 onclick="event.stopPropagation(); KampusImeceApp.showPhoto('${ev.id}', 'after')" 
                                 id="btn-photo-after-${ev.id}" 
-                                class="px-2 py-0.5 rounded-full transition text-[9px] ${currentPhotoMode === 'after' ? 'bg-emerald-600 text-white font-semibold shadow-sm' : 'text-slate-300 hover:text-white'}">
+                                class="px-2 py-0.5 rounded-md transition ${currentPhotoMode === 'after' ? 'bg-emerald-600 text-white font-semibold shadow' : 'text-slate-300 hover:text-white'}">
                             Sonrası ✨
                         </button>
                     </div>`;
@@ -454,34 +460,34 @@ const KampusImeceApp = {
             const formattedDate = dateObj.toLocaleDateString('tr-TR', { weekday: 'short', hour: '2-digit', minute: '2-digit' });
 
             html += `
-                <div id="event-card-${ev.id}" class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 transition-all duration-200 flex flex-col overflow-hidden group">
-                    <!-- ÜST RESİM VE MINIMAL ROZETLER -->
-                    <div class="relative h-32 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                <div id="event-card-${ev.id}" class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-emerald-500/30 dark:hover:border-emerald-500/30 transition-all duration-200 flex flex-col overflow-hidden group">
+                    <!-- ÜST RESİM VE ROZETLER -->
+                    <div class="relative h-36 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
                         <img id="event-img-${ev.id}" src="${displayImageUrl}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt="${this.escapeHtml(ev.title)}" />
                         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
 
-                        <!-- Sol Üst: Konum (Minimalist Pill) -->
-                        <div class="absolute top-2 left-2">
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-black/50 backdrop-blur-md text-white/90 shadow-sm">
-                                <i data-lucide="map-pin" class="w-2.5 h-2.5 text-emerald-400"></i>
-                                <span class="truncate max-w-[120px]">${this.escapeHtml(ev.locationName)}</span>
+                        <!-- Sol Üst: Konum (Taşmayan, Temiz Etiket) -->
+                        <div class="absolute top-2.5 left-2.5 z-10">
+                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium bg-black/60 backdrop-blur-md text-white shadow-sm max-w-[170px]">
+                                <i data-lucide="map-pin" class="w-3 h-3 text-emerald-400 shrink-0"></i>
+                                <span class="truncate">${this.escapeHtml(ev.locationName)}</span>
                             </span>
                         </div>
 
                         <!-- Sağ Üst: Durum Rozeti ve Şikayet Bildirimi Butonu -->
-                        <div class="absolute top-2 right-2 flex items-center gap-1 z-10">
+                        <div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
                             ${statusBadge}
                             <button type="button" 
                                     onclick="event.stopPropagation(); KampusImeceApp.openReportModal('${ev.id}', '${this.escapeHtml(ev.title)}')" 
                                     title="Moderatöre Bildir" 
-                                    class="p-1 rounded-full bg-black/40 hover:bg-rose-600/90 text-white/80 hover:text-white backdrop-blur-md transition-colors active:scale-95">
-                                <i data-lucide="flag" class="w-2.5 h-2.5"></i>
+                                    class="p-1.5 rounded-lg bg-black/50 hover:bg-rose-600 text-white/90 hover:text-white backdrop-blur-md transition-colors active:scale-95 shadow-sm">
+                                <i data-lucide="flag" class="w-3 h-3"></i>
                             </button>
                         </div>
 
                         <!-- Sol Alt: Tarih -->
-                        <div class="absolute bottom-2 left-2 text-white/90 text-[10px] font-medium flex items-center gap-1 pointer-events-none drop-shadow-sm">
-                            <i data-lucide="calendar" class="w-2.5 h-2.5 text-white/80"></i>
+                        <div class="absolute bottom-2.5 left-2.5 text-white text-[11px] font-medium flex items-center gap-1 drop-shadow-md">
+                            <i data-lucide="calendar" class="w-3 h-3 text-emerald-300 shrink-0"></i>
                             <span>${formattedDate}</span>
                         </div>
 
@@ -489,47 +495,52 @@ const KampusImeceApp = {
                         ${beforeAfterToggleHtml}
                     </div>
 
-                    <!-- KART GÖVDESİ (MINIMALIST) -->
-                    <div class="p-3 flex-1 flex flex-col justify-between">
+                    <!-- KART GÖVDESİ (HER BİLGİ NET, FERAH & KESİNTİSİZ) -->
+                    <div class="p-3.5 flex-1 flex flex-col justify-between">
                         <div>
-                            <h4 class="text-xs font-semibold text-slate-900 dark:text-white leading-snug truncate group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title="${this.escapeHtml(ev.title)}">
+                            <!-- Başlık (2 satıra kadar net okunaklı, boy hizalı) -->
+                            <h4 class="text-xs font-bold text-slate-900 dark:text-white leading-snug line-clamp-2 min-h-[2rem] group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors" title="${this.escapeHtml(ev.title)}">
                                 ${this.escapeHtml(ev.title)}
                             </h4>
-                            <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate leading-normal mt-0.5 mb-2">
-                                ${this.escapeHtml(ev.description)}
+                            <!-- Açıklama (Her detay rahatça okunur) -->
+                            <p class="text-[11px] text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mt-1 mb-2.5 min-h-[1.8rem]">
+                                ${this.escapeHtml(ev.description || 'Açıklama belirtilmedi.')}
                             </p>
                         </div>
 
                         <div>
-                            <!-- İLERLEME ÇUBUĞU (Minimalist) -->
+                            <!-- İLERLEME ÇUBUĞU (Ferah & Net) -->
                             ${!isCompleted ? `
-                                <div class="mb-2">
-                                    <div class="flex items-center justify-between text-[10px] mb-1">
-                                        <span class="text-slate-400 dark:text-slate-500">Gönüllü</span>
-                                        <span class="font-medium ${isFull ? 'text-amber-500' : 'text-slate-600 dark:text-slate-300'}">
-                                            ${ev.currentParticipantsCount}/${ev.requiredVolunteers}
+                                <div class="mb-2.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                                    <div class="flex items-center justify-between text-[11px] mb-1">
+                                        <span class="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                                            <i data-lucide="users" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
+                                            <span>Gönüllü Katılımı</span>
+                                        </span>
+                                        <span class="font-bold ${isFull ? 'text-amber-500' : 'text-slate-700 dark:text-slate-200'}">
+                                            ${ev.currentParticipantsCount} / ${ev.requiredVolunteers}
                                         </span>
                                     </div>
-                                    <div class="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                                    <div class="w-full h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
                                         <div class="h-full rounded-full transition-all duration-300 ${isFull ? 'bg-amber-500' : 'bg-emerald-500'}" style="width: ${percent}%"></div>
                                     </div>
                                 </div>` : ''}
 
-                            <!-- Tamamlanma Notu (Minimal) -->
+                            <!-- Tamamlanma Rapor Notu -->
                             ${completionNoteHtml}
 
-                            <!-- Katılımcılar & İlan Sahibi -->
-                            <div class="flex items-center justify-between mb-2 text-[10px]">
-                                <div class="flex items-center gap-1">
+                            <!-- Katılımcılar & İlan Sahibi (Taşmayan, Net Çizgi) -->
+                            <div class="flex items-center justify-between mb-2.5 text-[11px] pt-1 border-t border-slate-100 dark:border-slate-800/80">
+                                <div class="flex items-center gap-1.5 min-w-0">
                                     ${avatarsHtml}
-                                    <span class="text-slate-400 dark:text-slate-500 text-[9px] ml-0.5">${ev.currentParticipantsCount} kişi</span>
+                                    <span class="text-slate-500 dark:text-slate-400 text-[10px] truncate">${ev.currentParticipantsCount} kişi</span>
                                 </div>
-                                <span class="text-slate-400 dark:text-slate-500 text-[10px] truncate max-w-[100px]">
-                                    ${this.escapeHtml((ev.creatorName || '').split(' ')[0])}
+                                <span class="text-slate-500 dark:text-slate-400 text-[10px] shrink-0">
+                                    İlan: <strong class="text-slate-700 dark:text-slate-200 font-semibold">${this.escapeHtml((ev.creatorName || '').split(' ')[0])}</strong>
                                 </span>
                             </div>
 
-                            <!-- Butonlar (Minimalist) -->
+                            <!-- Butonlar (Geniş, Rahat Tıklanır, Asla İç İçe Geçmeyen) -->
                             <div>
                                 ${actionBtnHtml}
                             </div>
