@@ -4,101 +4,115 @@
 
 @Html.AntiForgeryToken()
 
-<!-- ÜST KONTROL & FİLTRE ÇUBUĞU -->
-<div class="mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-    
-    <!-- Filtre Sekmeleri -->
-    <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-        <button type="button" 
-                data-filter="all" 
-                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 dark:bg-emerald-600 text-white shadow-sm transition-all whitespace-nowrap">
-            Tümü
-        </button>
-        <button type="button" 
-                data-filter="open" 
-                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
-            Açık Kontenjan
-        </button>
-        <button type="button" 
-                data-filter="completed" 
-                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
-            Temizlenenler ✨
-        </button>
-        <button type="button" 
-                data-filter="yurt" 
-                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
-            Yurt Yolu
-        </button>
-        <button type="button" 
-                data-filter="fakulte" 
-                class="filter-tab-btn px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all whitespace-nowrap">
-            Fakülteler
-        </button>
-    </div>
+<!-- KAPSAYICI DASHBOARD (Masaüstünde Sayfayı Kaydırmadan Tam Sığan Yapı) -->
+<div class="flex flex-col h-full lg:h-[calc(100vh-4.25rem)] overflow-hidden">
 
-    <!-- Arama & Bildir Butonu -->
-    <div class="flex items-center gap-2">
-        <div class="relative w-full sm:w-56">
-            <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
-                <i data-lucide="search" class="w-3.5 h-3.5"></i>
-            </span>
-            <input type="text" 
-                   id="searchEventsInput" 
-                   placeholder="İlan veya konum ara..." 
-                   class="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition" />
-        </div>
-
-        @if (User.Identity?.IsAuthenticated == true)
-        {
+    <!-- ÜST KONTROL & MODERN SEGMENTED FİLTRE ÇUBUĞU -->
+    <div class="mb-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 shrink-0">
+        
+        <!-- Modern Segmented Pill Filtreler -->
+        <div class="p-1 bg-slate-200/60 dark:bg-slate-900/80 rounded-2xl border border-slate-300/40 dark:border-slate-800 backdrop-blur-md shadow-inner flex items-center gap-1 overflow-x-auto max-w-full scrollbar-none">
             <button type="button" 
-                    onclick="window.openCreateModal()" 
-                    class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-sm whitespace-nowrap active:scale-95">
-                <i data-lucide="plus" class="w-3.5 h-3.5"></i>
-                <span>İlan Aç</span>
+                    data-filter="all" 
+                    class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap bg-white dark:bg-emerald-600 text-emerald-800 dark:text-white shadow-sm border border-slate-200/60 dark:border-transparent">
+                <i data-lucide="layers" class="w-3.5 h-3.5"></i>
+                <span>Tümü</span>
             </button>
-        }
-    </div>
-</div>
+            <button type="button" 
+                    data-filter="open" 
+                    class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800">
+                <i data-lucide="user-check" class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400"></i>
+                <span>Açık Kontenjan</span>
+            </button>
+            <button type="button" 
+                    data-filter="completed" 
+                    class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500"></i>
+                <span>Temizlenenler ✨</span>
+            </button>
+            <button type="button" 
+                    data-filter="yurt" 
+                    class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800">
+                <i data-lucide="home" class="w-3.5 h-3.5 text-blue-500 dark:text-blue-400"></i>
+                <span>Yurt Yolu</span>
+            </button>
+            <button type="button" 
+                    data-filter="fakulte" 
+                    class="filter-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center gap-1.5 whitespace-nowrap text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800">
+                <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-purple-500 dark:text-purple-400"></i>
+                <span>Fakülteler</span>
+            </button>
+        </div>
 
-<!-- ANA GÖVDE: SPLIT VIEW (SOL: CANLI HARİTA, SAĞ: KARTLAR) -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
-
-    <!-- SOL: CANLI HARİTA -->
-    <div class="lg:col-span-5 sticky top-20 z-20">
-        <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2 shadow-sm transition-colors">
-            <div class="flex items-center justify-between px-2.5 py-1.5 mb-1 text-xs">
-                <div class="flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span class="font-semibold text-slate-800 dark:text-slate-100">Kampüs Haritası</span>
-                </div>
-                <div class="flex items-center gap-2.5 text-[11px] text-slate-500 dark:text-slate-400">
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Açık</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Az Kaldı</span>
-                    <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-700"></span> Bitti</span>
-                </div>
+        <!-- Arama & Bildir Butonu -->
+        <div class="flex items-center gap-2">
+            <div class="relative w-full sm:w-56">
+                <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none text-slate-400">
+                    <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                </span>
+                <input type="text" 
+                       id="searchEventsInput" 
+                       placeholder="İlan veya konum ara..." 
+                       class="w-full pl-8 pr-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 shadow-sm transition" />
             </div>
 
-            <!-- Leaflet Container -->
-            <div id="campusLiveMap" class="h-[360px] lg:h-[560px] w-full rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800"></div>
-
-            <div class="px-2.5 pt-2 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500">
-                <span>Alaaddin Keykubat Kampüsü</span>
-                <span>Pin seçildiğinde karta odaklanır</span>
-            </div>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <button type="button" 
+                        onclick="window.openCreateModal()" 
+                        class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition shadow-sm whitespace-nowrap active:scale-95">
+                    <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                    <span>İlan Aç</span>
+                </button>
+            }
         </div>
     </div>
 
-    <!-- SAĞ: ETKİNLİK KARTLARI -->
-    <div class="lg:col-span-7">
-        <div id="loadingIndicator" class="hidden py-10 text-center">
-            <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 shadow-sm">
-                <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-emerald-600"></i>
-                <span>Noktalar yükleniyor...</span>
+    <!-- ANA GÖVDE: SPLIT VIEW (SOL: CANLI HARİTA, SAĞ: KARTLAR) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1 min-h-0 items-stretch overflow-hidden">
+
+        <!-- SOL: CANLI HARİTA (Masaüstünde Sayfaya Tam Sığar) -->
+        <div class="lg:col-span-6 xl:col-span-7 flex flex-col h-[360px] lg:h-full min-h-0">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-2.5 shadow-sm transition-colors flex flex-col h-full min-h-0">
+                <div class="flex items-center justify-between px-2.5 py-1 mb-1 text-xs shrink-0">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span class="font-semibold text-slate-800 dark:text-slate-100">Kampüs Haritası</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 text-[11px] text-slate-500 dark:text-slate-400">
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Açık</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Az Kaldı</span>
+                        <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-700"></span> Bitti</span>
+                    </div>
+                </div>
+
+                <!-- Leaflet Container: flex-1 ile dikeyde tam sığar -->
+                <div id="campusLiveMap" class="flex-1 w-full rounded-xl overflow-hidden border border-slate-100 dark:border-slate-800 min-h-0"></div>
+
+                <div class="px-2.5 pt-1.5 flex items-center justify-between text-[11px] text-slate-400 dark:text-slate-500 shrink-0">
+                    <span>Alaaddin Keykubat Kampüsü</span>
+                    <div class="flex items-center gap-2 text-[10px]">
+                        <span>Pin seçildiğinde karta odaklanır</span>
+                        <span>·</span>
+                        <button type="button" onclick="openGlobalKvkkModal('kvkk')" class="hover:underline">KVKK</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div id="eventsListContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- JavaScript (app.js) tarafından doldurulur -->
+        <!-- SAĞ: ETKİNLİK KARTLARI (Kendi İçinde Kaydırılabilir) -->
+        <div class="lg:col-span-6 xl:col-span-5 flex flex-col h-full min-h-0 overflow-hidden">
+            <div id="loadingIndicator" class="hidden py-8 text-center shrink-0">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-300 shadow-sm">
+                    <i data-lucide="loader-2" class="w-3.5 h-3.5 animate-spin text-emerald-600"></i>
+                    <span>Noktalar yükleniyor...</span>
+                </div>
+            </div>
+
+            <!-- Kart Listesi (Sadece bu alan kayar, harita sabit kalır) -->
+            <div id="eventsListContainer" class="flex-1 overflow-y-auto pr-1 pb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-3.5 scrollbar-thin">
+                <!-- JavaScript (app.js) tarafından doldurulur -->
+            </div>
         </div>
     </div>
 </div>

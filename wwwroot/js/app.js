@@ -58,6 +58,14 @@ const KampusImeceApp = {
 
         this.markersLayer = L.layerGroup().addTo(this.map);
         this.eventMarkers = {};
+
+        setTimeout(() => {
+            if (this.map) this.map.invalidateSize();
+        }, 200);
+
+        window.addEventListener('resize', () => {
+            if (this.map) this.map.invalidateSize();
+        });
     },
 
     // 2. ETKİNLİKLERİ API'DEN YÜKLEME VE KOORDİNAT DÖNÜŞÜMÜ
@@ -105,18 +113,22 @@ const KampusImeceApp = {
     // 3. FİLTRELEME & ARAMA MANTIĞI
     setupFilters: function () {
         const filterButtons = document.querySelectorAll('.filter-tab-btn');
+        const activeClasses = ['bg-white', 'dark:bg-emerald-600', 'text-emerald-800', 'dark:text-white', 'shadow-sm', 'font-semibold', 'border', 'border-slate-200/60', 'dark:border-transparent'];
+        const inactiveClasses = ['text-slate-600', 'dark:text-slate-400', 'hover:text-slate-900', 'dark:hover:text-white', 'hover:bg-white/60', 'dark:hover:bg-slate-800', 'font-medium'];
+
         filterButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 filterButtons.forEach(b => {
-                    b.classList.remove('bg-slate-900', 'dark:bg-emerald-600', 'text-white', 'shadow-sm', 'font-semibold');
-                    b.classList.add('bg-white', 'dark:bg-slate-900', 'text-slate-600', 'dark:text-slate-300', 'hover:text-slate-900', 'dark:hover:text-white', 'border', 'border-slate-200', 'dark:border-slate-800', 'font-medium');
+                    b.classList.remove(...activeClasses);
+                    b.classList.add(...inactiveClasses);
                 });
 
-                btn.classList.remove('bg-white', 'dark:bg-slate-900', 'text-slate-600', 'dark:text-slate-300', 'hover:text-slate-900', 'dark:hover:text-white', 'border', 'border-slate-200', 'dark:border-slate-800', 'font-medium');
-                btn.classList.add('bg-slate-900', 'dark:bg-emerald-600', 'text-white', 'shadow-sm', 'font-semibold');
+                btn.classList.remove(...inactiveClasses);
+                btn.classList.add(...activeClasses);
 
                 this.activeFilter = btn.getAttribute('data-filter') || 'all';
                 this.applyFilters();
+                if (window.lucide) lucide.createIcons();
             });
         });
     },
