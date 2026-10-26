@@ -11,6 +11,10 @@ services:
         value: Production
       - key: PORT
         value: 10000
+      - key: ASPNETCORE_HTTP_PORTS
+        value: 10000;8080
+      - key: ASPNETCORE_URLS
+        value: http://0.0.0.0:10000;http://0.0.0.0:8080
       - key: ConnectionStrings__DefaultConnection
         fromDatabase:
           name: kampus-imece-db

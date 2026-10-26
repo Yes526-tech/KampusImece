@@ -167,7 +167,6 @@
                             <span>Kirlilik Alanı Fotoğrafı (Öncesi) <span class="text-rose-500 font-bold">*</span></span>
                         </label>
                         <div id="photoDropZone" 
-                             onclick="document.getElementById('photoFileInput').click()" 
                              class="border-2 border-dashed border-emerald-500/70 hover:border-emerald-600 dark:border-emerald-500/60 rounded-xl p-3.5 text-center cursor-pointer transition bg-emerald-50/40 dark:bg-emerald-950/20 hover:bg-emerald-50/60 relative">
                             <input type="file" 
                                    name="Photo" 
@@ -205,7 +204,6 @@
                             <span>Temizlenmiş Hali (Sonrası - İsteğe Bağlı)</span>
                         </label>
                         <div id="createAfterPhotoDropZone" 
-                             onclick="document.getElementById('createAfterPhotoFileInput').click()" 
                              class="border-2 border-dashed border-teal-500/50 hover:border-teal-600 dark:border-teal-500/40 rounded-xl p-3.5 text-center cursor-pointer transition bg-teal-50/30 dark:bg-teal-950/20 hover:bg-teal-50/50 relative">
                             <input type="file" 
                                    name="AfterPhoto" 
@@ -540,5 +538,5 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/app.js" asp-append-version="true"></script>
+    <script src="~/js/app.js?v=20261026_deploy2" asp-append-version="true"></script>
 }
